@@ -1238,6 +1238,12 @@ function loveInsights(){
     return {title:`${Rn}に伝わりやすいこと`, lines, gap};
   });
 }
+function renderLoveLink(){
+  return `<section class="q"><div class="q-head"><div class="q-title"><h3>まずは公式の診断から</h3>
+      <p class="hint">どんなことをされると「大切にされている」と感じるかを、5つ（言葉・一緒の時間・プレゼント・行動・スキンシップ）に分ける診断です。無料・30問・約4分。英語ですが、Safari の「ぁあ」→「日本語に翻訳」で読めます。</p></div></div>
+    <div class="q-body"><a class="btn pri" href="https://5lovelanguages.com/" target="_blank" rel="noopener">公式サイトを開く</a>
+      <p class="fhint">開いたら「Take the Quiz」（クイズを受ける）から始めます。終わったら、結果の割合（%）を下の「割合を書く」に入れてください。</p></div></section>`;
+}
 function renderLoveAbout(){
   return `<section class="q"><div class="q-head"><div class="q-title"><h3>5つの愛の言語って？</h3>
       <p class="hint">アメリカの結婚カウンセラー、ゲーリー・チャップマンが1992年に提唱した考え方。どんなことをされると「愛されている」と感じるかを5つに分けます。</p></div></div>
@@ -1261,7 +1267,8 @@ function hwRow(K, calcBase, fb, nameHtml, delBtn=''){
 }
 
 function renderCard(t, c){
-  if(SOLO) return soloCard(t, c) ? `<section class="q" id="q-${t}-${c.id}"><div class="q-head"><div class="q-title"><h3>${esc(fmt(c.title))}</h3>${c.hint?`<p class="hint">${esc(fmt(c.hint))}</p>`:''}</div></div>
+  const sh = c.hint ? fmt(c.hint).replace(/このカードは「まとめ」.*$/, '') : '';
+  if(SOLO) return soloCard(t, c) ? `<section class="q" id="q-${t}-${c.id}"><div class="q-head"><div class="q-title"><h3>${esc(fmt(c.title))}</h3>${sh?`<p class="hint">${esc(sh)}</p>`:''}</div></div>
       <div class="q-body">${renderCardBody(t,c)}</div></section>` : '';
   const C = card(t, c.id), key = `${t}|${c.id}`;
   const collapsed = C.st==='ok' && !S.open[key];
@@ -1616,7 +1623,7 @@ function renderShared(){
     <div class="topic-head"><div class="topic-title"><h2>${T.title}</h2><span class="when">${G.name?G.name+'　':''}${G.label}</span></div><p class="lead">${esc(T.lead)}</p></div>
     ${T.id===TOPICS[0].id && !lsGet(LS+'intro-hide') ? renderIntro() : ''}
     ${SOLO ? '' : renderSummary(T.id)}
-    ${T.id==='love' ? `<div class="cards" style="margin-bottom:16px">${renderLoveAbout()}</div>` : ''}
+    ${T.id==='love' ? `<div class="cards" style="margin-bottom:16px">${SOLO ? renderLoveLink() : renderLoveAbout()}</div>` : ''}
     ${T.id==='flow' ? (SOLO ? renderSoloFlow() : renderFlow()) : T.id==='summary' ? (SOLO ? renderSend() : renderSummaryPage() + renderExchange()) : `<div class="cards">${T.cards.map(c=>renderCard(T.id,c)).join('')}</div>`}
     ${renderPager(T)}`;
   autosizeAll(); paintCalc();
@@ -1624,9 +1631,11 @@ function renderShared(){
 /* ---------- {you}版とのやりとり（LINEで文字を送る） ----------
    送るのは{you}が書く欄だけ（{you}の考え・チップ・文章、「プロポーズのこと」、{you}担当のやることの完了）。
    {me}の欄・二人の結論は入れない。項目ごとの更新時刻で新しい方を残す */
-const soloCard = (t, c) => t==='propose' || c.type==='lovequiz' || c.type==='loveofficial'
+const soloCard = (t, c) => t==='propose' || c.type==='loveofficial'
   || (c.type==='form' && c.fields.some(fd => fd.tags || fd.pair || (fd.opts && !fd.noSplit)));
-const TOPS = () => SOLO ? TOPICS.filter(t => t.id==='flow' || t.id==='summary' || t.cards.some(c => soloCard(t.id, c))) : TOPICS;
+// {you}版で出すページ。一人で考えてほしいところだけに絞る（多いと身構えてしまうので）
+const SOLO_TOPICS = ['couple','vision','love','fun','propose','summary'];
+const TOPS = () => SOLO ? TOPICS.filter(t => SOLO_TOPICS.includes(t.id)) : TOPICS;
 function ownedByYou(t, c, f){
   if(t==='flow'){
     const id = f.replace(/\.done$/, ''), x = FLOW_TASKS.find(y => y.id===id);
@@ -1703,11 +1712,10 @@ function renderSoloFlow(){
   </div>`;
 }
 function renderIntro(){
-  if(SOLO) return `<div class="intro"><b>このノートについて</b><ol>
-    <li>カフェで二人で話す前に、自分の分だけ先に選んでおくためのノートです。${esc(ME())}の答えはここには出ません。</li>
-    <li>迷ったら空けたままでOK。「まだうまく言葉にできない」も立派な答えです。</li>
-    <li>書いた内容は、このスマホの中にだけ保存されます。</li>
-    <li>書けたら、いちばん下の「送る」から${esc(ME())}にLINEで送ってください。</li></ol>
+  if(SOLO) return `<div class="intro"><b>このノートについて</b>
+    <p style="margin:6px 0">次に会うときの話のタネに、自分の分だけ先に選んでおくノートです。${esc(ME())}の答えはここには出ません。ほとんどタップで選ぶだけです。</p>
+    <ol><li>どんな夫婦でいたいか</li><li>どんな家庭にしたいか</li><li>愛情の伝え方（公式の診断 約4分）</li><li>暮らしの楽しみ</li><li>プロポーズのこと（好みだけ）</li></ol>
+    <p style="margin:6px 0">全部埋めなくて大丈夫。迷ったら空けたままでOKです。書いた内容はこのスマホの中にだけ保存されます。書けたら最後の「送る」から、LINEで送ってください。</p>
     <div class="row-btns"><button type="button" class="mini" data-act="intro-hide">わかったので閉じる</button></div></div>`;
   return `<div class="intro"><b>このノートの使い方</b><ol>
     <li>上の段から順に話します。1回20〜30分、1〜2ページずつで十分です。</li>
