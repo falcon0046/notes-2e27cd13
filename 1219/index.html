@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>12/19の予定</title>
+<style>
+:root{
+  --bg:#f7f3ee; --card:#fffdfa; --ink:#2b2522; --sub:#7a6e66; --line:#e7ddd3;
+  --accent:#b23a48; --accent-soft:#f6e3e5; --green:#3d6b56; --green-soft:#e2eee7;
+  --chip:#f1ebe4; --shadow:0 1px 2px rgba(60,40,30,.06),0 4px 16px rgba(60,40,30,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1b1817; --card:#252120; --ink:#f1ebe6; --sub:#a99d95; --line:#3a3431;
+    --accent:#e07a86; --accent-soft:#3d2629; --green:#8cc3a6; --green-soft:#23332b;
+    --chip:#302b29; --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",sans-serif;
+  line-height:1.7;font-size:16px}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 120px}
+header{text-align:center;padding:28px 0 12px}
+header .kicker{color:var(--accent);font-size:13px;letter-spacing:.2em}
+header h1{font-size:26px;margin:6px 0 4px;letter-spacing:.04em}
+header p{margin:0;color:var(--sub);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px;margin:14px 0;box-shadow:var(--shadow)}
+h2{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+h2 .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:13px;font-weight:700;flex:none}
+.place{display:flex;gap:12px;align-items:flex-start}
+.place .ico{font-size:28px;line-height:1}
+.place b{font-size:17px}
+.place small{display:block;color:var(--sub)}
+a{color:var(--accent)}
+.day{margin:6px 0 2px;font-weight:700;color:var(--accent);font-size:14px}
+.tl{list-style:none;margin:0 0 8px;padding:0;position:relative}
+.tl li{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.tl li:last-child{border-bottom:0}
+.tl .t{color:var(--sub);font-variant-numeric:tabular-nums;font-size:14px;padding-top:1px}
+.tl .d small{display:block;color:var(--sub);font-size:13px}
+.note{background:var(--green-soft);color:var(--green);border-radius:12px;padding:10px 12px;font-size:14px;margin-top:8px}
+.q{margin:0 0 4px;color:var(--sub);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.chip{appearance:none;border:1px solid var(--line);background:var(--chip);color:var(--ink);
+  border-radius:999px;padding:8px 14px;font-size:15px;font-family:inherit;cursor:pointer;line-height:1.3;
+  -webkit-tap-highlight-color:transparent}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.add{border-style:dashed;background:transparent;color:var(--sub)}
+.label{font-size:13px;color:var(--sub);margin:12px 0 0}
+textarea,input[type=text]{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+textarea{min-height:64px;resize:vertical}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.bar .in{max-width:560px;margin:0 auto;display:flex;gap:8px}
+.btn{flex:1;appearance:none;border:0;border-radius:14px;padding:14px;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.btn.main{background:var(--accent);color:#fff}
+.btn.sub{background:var(--chip);color:var(--ink);flex:0 0 auto;padding:14px 16px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+footer{text-align:center;color:var(--sub);font-size:13px;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">PLAN</div>
+  <h1>12/19(土)〜20(日)</h1>
+  <p>いったん仮でこんな感じにしてみたよ。<br>いっしょに決めたいことを下にまとめたので、気軽に選んでね。</p>
+</header>
+
+<section class="card">
+  <div class="place">
+    <div class="ico">🗼</div>
+    <div>
+      <b>ザ・プリンス パークタワー東京</b>
+      <small>港区芝公園　東京タワーのすぐ横のホテル</small>
+      <small>最寄り：赤羽橋駅・芝公園駅・御成門駅・大門駅・浜松町駅</small>
+      <a href="https://maps.google.com/?q=ザ・プリンス+パークタワー東京" target="_blank" rel="noopener">地図をひらく</a>
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>当日の流れ（案）</h2>
+  <div class="day">12/19（土）</div>
+  <ul class="tl">
+    <li><div class="t">昼〜</div><div class="d">待ち合わせ・おでかけ<small>何をするかは下の「3」でいっしょに決めたい</small></div></li>
+    <li><div class="t">夕方</div><div class="d">ホテルにチェックイン<small>東京タワー側の部屋</small></div></li>
+    <li><div class="t">18:00</div><div class="d">ホテル地下のステーキハウスでクリスマスコース<small>カウンター席・ホテルの中なので移動なし</small></div></li>
+    <li><div class="t">21:00</div><div class="d">部屋にクリスマスケーキが届く<small>シャンパンもついてるよ</small></div></li>
+    <li><div class="t">夜</div><div class="d">部屋から東京タワーを見ながらゆっくり</div></li>
+  </ul>
+  <div class="day">12/20（日）</div>
+  <ul class="tl">
+    <li><div class="t">朝</div><div class="d">ゆっくり起きてチェックアウト</div></li>
+    <li><div class="t">そのあと</div><div class="d">どうするかは下の「5」で</div></li>
+  </ul>
+  <div class="note">👗 ホテルのレストランなので、服はちょっとだけきれいめだとちょうどいいかも</div>
+</section>
+
+<div id="qs"></div>
+
+<footer>選んだ内容はこの端末にだけ保存されます</footer>
+</div>
+
+<div class="bar"><div class="in">
+  <button class="btn sub" id="reset" type="button">リセット</button>
+  <button class="btn main" id="send" type="button">答えをLINEで送る</button>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// 質問の定義。multi=true は複数選べる、false は1つだけ
+const QS = [
+  {id:'ok', title:'日にち・場所はこれで大丈夫そう？', multi:false,
+   opts:['いいね！','ちょっと相談したい','ほかの日・場所も見てみたい']},
+  {id:'food', title:'ステーキのコースで平気？苦手な食べ物はある？', multi:true,
+   hint:'苦手なものを選んでね（なければ「特になし」）',
+   opts:['特になし','脂身が多いお肉','レア気味のお肉','生もの','えび・かに','貝','魚卵','きのこ','香りの強い野菜','辛いもの','お酒はあまり飲めない']},
+  {id:'day', title:'19日の昼〜夕方、何かしたいことある？', multi:true,
+   opts:['東京タワーにのぼる','増上寺・芝公園をさんぽ','カフェでのんびり','麻布台ヒルズあたり','クリスマスマーケット','イルミネーション','お買いもの','早めにチェックインして部屋でゆっくり','ゆっくり来て夕方集合でいい']},
+  {id:'meet', title:'待ち合わせは何時ごろ・どこがいい？', multi:true,
+   hint:'時間と場所をそれぞれ選んでね',
+   opts:['12時ごろ','13時ごろ','14時ごろ','15時ごろ','16時ごろ','浜松町駅','大門駅','東京駅','家の近くでいっしょに行く','ホテルに直接']},
+  {id:'next', title:'20日はどうしたい？', multi:true,
+   opts:['朝はとにかくゆっくり','東京タワー・芝公園あたりを散歩','どこかでランチしてから帰る','お買いもの','そのまま帰ってのんびり','おまかせ']},
+  {id:'rose', title:'部屋にバラの花束がつくんだけど、ドライフラワーにして残したいなと思ってて、どうかな？', multi:false,
+   hint:'残し方もいっしょに決めたい',
+   opts:['お店に頼んできれいに加工してほしい（ボトル・額など）','自分たちで乾かしてドライフラワーに','花束のまま飾って楽しみたい','おまかせ']},
+  {id:'other', title:'ほかに希望・気になることがあれば', multi:true, opts:[]},
+];
+
+const KEY = 'plan1219-v1';
+let S = {};
+try { S = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch(e) { S = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+const st = id => (S[id] ||= {sel:[], extra:[], memo:''});
+
+const qs = document.getElementById('qs');
+
+function render(){
+  qs.innerHTML = '';
+  QS.forEach((q, i) => {
+    const s = st(q.id);
+    const card = document.createElement('section');
+    card.className = 'card';
+    card.innerHTML = `<h2><span class="n">${i+1}</span>${esc(q.title)}</h2>` +
+      (q.hint ? `<p class="q">${esc(q.hint)}</p>` : '');
+    const opts = [...q.opts, ...s.extra];
+    if (opts.length || q.multi) {
+      const chips = document.createElement('div');
+      chips.className = 'chips';
+      opts.forEach(o => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'chip'; b.textContent = o;
+        b.setAttribute('aria-pressed', s.sel.includes(o));
+        b.onclick = () => {
+          if (s.sel.includes(o)) s.sel = s.sel.filter(x => x !== o);
+          else s.sel = q.multi ? [...s.sel, o] : [o];
+          save(); render();
+        };
+        chips.appendChild(b);
+      });
+      if (q.multi && q.opts.length) {
+        const add = document.createElement('button');
+        add.type = 'button'; add.className = 'chip add'; add.textContent = '＋自分で書く';
+        add.onclick = () => {
+          const v = (prompt('追加したいこと') || '').trim();
+          if (v && !opts.includes(v)) { s.extra.push(v); s.sel.push(v); save(); render(); }
+        };
+        chips.appendChild(add);
+      }
+      if (opts.length || q.opts.length) card.appendChild(chips);
+    }
+    const ta = document.createElement('textarea');
+    ta.placeholder = q.opts.length ? 'ほかにあれば・くわしく（なくてOK）' : '自由に書いてね';
+    ta.value = s.memo;
+    ta.oninput = () => { s.memo = ta.value; save(); };
+    card.appendChild(ta);
+    qs.appendChild(card);
+  });
+}
+
+function esc(t){ return t.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function buildText(){
+  const lines = ['【12/19の予定 わたしの答え】'];
+  QS.forEach((q, i) => {
+    const s = st(q.id);
+    if (!s.sel.length && !s.memo.trim()) return;
+    lines.push('', `${i+1}. ${q.title}`);
+    if (s.sel.length) lines.push('→ ' + s.sel.join('、'));
+    if (s.memo.trim()) lines.push('メモ：' + s.memo.trim());
+  });
+  return lines.length > 1 ? lines.join('\n') : '';
+}
+
+function toast(m){
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2200);
+}
+
+document.getElementById('send').onclick = async () => {
+  const text = buildText();
+  if (!text) { toast('まだ何も選ばれていないよ'); return; }
+  // スマホは共有シートからLINEを選べる。使えなければコピーにする
+  if (navigator.share) {
+    try { await navigator.share({text}); return; } catch(e) { if (e.name === 'AbortError') return; }
+  }
+  try { await navigator.clipboard.writeText(text); toast('コピーしたよ。LINEに貼りつけてね'); }
+  catch(e) { window.prompt('この文章をコピーしてLINEに貼りつけてね', text); }
+};
+
+document.getElementById('reset').onclick = () => {
+  if (!confirm('選んだ内容をぜんぶ消す？')) return;
+  S = {}; save(); render();
+};
+
+render();
+</script>
+</body>
+</html>
