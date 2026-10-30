@@ -1,0 +1,2204 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="結婚準備ノート">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>結婚準備ノート</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Maru+Gothic:wght@500;700&display=swap">
+<style>
+/* Layout: トップダウンの話し合いノート。左レールは「第1段 方針 → 第2段 ルール → 第3段 数字」。各ページの上に、上の段で決まったことを出す。 */
+:root{
+  --bg:#f2f4f3; --surface:#ffffff; --sunk:#f7f9f8; --ink:#1c2625; --muted:#63716d; --line:#d9e0dd;
+  --accent:#23675f; --accent-ink:#ffffff; --accent-soft:#e1eeeb;
+  --ok:#2c7a4c; --ok-soft:#dcf0e3; --warn:#93600a; --warn-soft:#faeed3; --hold:#69716e; --hold-soft:#e9ecea;
+  --bad:#b2362d; --bad-soft:#f8e0dd; --self:#5b3f75; --self-soft:#efe7f5;
+  --you:#9a5a2c; --you-soft:#f1e2d6; --both:#4f68a8;
+  --f-display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121817; --surface:#1a2221; --sunk:#151c1b; --ink:#e4ebe9; --muted:#97a5a1; --line:#2c3836;
+  --accent:#6fb9b0; --accent-ink:#0f1d1b; --accent-soft:#1d3532;
+  --ok:#7fcf9e; --ok-soft:#1b3326; --warn:#e3b45e; --warn-soft:#382c15; --hold:#a5aeab; --hold-soft:#262d2c;
+  --bad:#ef8c82; --bad-soft:#3b211e; --self:#c6a6e2; --self-soft:#2d2440; --you:#e2a77b; --you-soft:#3a2a1f; --both:#9db0e6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121817; --surface:#1a2221; --sunk:#151c1b; --ink:#e4ebe9; --muted:#97a5a1; --line:#2c3836;
+  --accent:#6fb9b0; --accent-ink:#0f1d1b; --accent-soft:#1d3532;
+  --ok:#7fcf9e; --ok-soft:#1b3326; --warn:#e3b45e; --warn-soft:#382c15; --hold:#a5aeab; --hold-soft:#262d2c;
+  --bad:#ef8c82; --bad-soft:#3b211e; --self:#c6a6e2; --self-soft:#2d2440; --you:#e2a77b; --you-soft:#3a2a1f; --both:#9db0e6; color-scheme:dark}
+body.self{--accent:var(--self); --accent-soft:var(--self-soft)}
+
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.35}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:12px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0;flex:1}
+.brand h1{font-size:19px;white-space:nowrap}
+.mode{font-size:12px;padding:2px 10px;border-radius:99px;background:var(--accent-soft);color:var(--accent);white-space:nowrap;font-weight:700}
+.saved{font-size:12px;color:var(--muted);white-space:nowrap}
+.icon-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:7px 12px;font-size:13px;min-height:40px}
+.icon-btn svg{width:16px;height:16px;flex:none}
+.icon-btn:hover{border-color:var(--accent)}
+
+/* shell */
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;max-width:1240px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);align-self:start;display:flex;flex-direction:column;gap:14px}
+.rail[hidden]{display:none}
+.rail-group{display:flex;flex-direction:column;gap:4px}
+.rail-label{font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:700;padding-left:4px}
+.rail-label b{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 6px;margin-right:6px}
+.tab{display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;border-radius:10px;padding:10px 10px;min-height:44px;width:100%}
+.tab:hover{background:var(--sunk)}
+.tab[aria-current="true"]{background:var(--accent);color:var(--accent-ink)}
+.tab .t-name{flex:1;font-weight:500}
+.meter{display:flex;gap:2px}
+.meter i{width:6px;height:6px;border-radius:2px;background:var(--line)}
+.meter i.ok{background:var(--ok)}.meter i.tmp{background:var(--warn)}.meter i.hold{background:var(--hold)}
+
+main{min-width:0}
+.topic-head{margin-bottom:16px}
+.topic-title{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px}
+.topic-head h2{font-size:26px}
+.topic-head .when{font-size:12px;color:var(--accent);background:var(--accent-soft);border-radius:99px;padding:2px 10px;font-weight:700}
+.lead{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.cards{display:flex;flex-direction:column;gap:16px}
+
+/* 上の段のまとめ */
+.sumbox{border:1px solid var(--line);border-left:0;background:var(--surface);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+.sumbox::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--accent)}
+.sumbox .sh{font-size:13px;font-weight:700;color:var(--muted)}
+.sumbox .known span{font-size:13px;padding:3px 10px}
+.sumbox .known span b{font-weight:500;color:var(--muted);margin-right:4px}
+.sumbox .none{font-size:13px;color:var(--muted)}
+.link{border:0;background:none;color:var(--accent);text-decoration:underline;padding:0;font:inherit;cursor:pointer}
+
+/* question card */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.q-head{padding:16px 18px 4px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-start}
+.q-title{flex:1;min-width:min(260px,100%)}
+.q-head > h3{flex:1 1 auto}
+.q-head > .hint{flex:0 0 100%;max-width:none;margin-top:-6px}
+/* 5つの愛の言語 */
+.ll-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:1100px){ .ll-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .ll:last-child{grid-column:1/-1} }
+@media (max-width:560px){ .ll-grid{grid-template-columns:minmax(0,1fr)} }
+.ll{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:var(--sunk)}
+.ll .ll-n{font-family:var(--f-display);font-size:12px;color:var(--accent);font-weight:700}
+.ll b{font-family:var(--f-display);font-size:16px}
+.ll span{font-size:13px}
+.ll small{font-size:12px;color:var(--muted)}
+.lo-rank{display:grid;grid-template-columns:3em 8.5em minmax(0,1fr) 3em;gap:8px;align-items:center;font-size:14px;padding:3px 0}
+.lo-rank .lo-pos{font-size:12px;color:var(--muted);font-weight:700}
+.lo-rank b{text-align:right;font-variant-numeric:tabular-nums}
+.lo-edit summary{cursor:pointer;color:var(--accent);font-size:13px;padding:6px 0;min-height:36px;display:flex;align-items:center}
+.lo-in{display:grid;grid-template-columns:8.5em 130px;gap:8px;align-items:center;font-size:14px;padding:3px 0}
+.lq{padding:10px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.lq-q{font-weight:500}
+.ll-res{display:flex;flex-direction:column;gap:6px;padding:6px 0}
+.ll-row{display:grid;grid-template-columns:130px minmax(0,1fr) 2em minmax(0,1fr) 2em;gap:10px;align-items:center;font-size:14px}
+.ll-row.h{font-size:12px;color:var(--muted);font-weight:700}
+.ll-row b{font-variant-numeric:tabular-nums;color:var(--accent)}
+.llbar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.llbar i{display:block;height:100%;background:var(--accent)}
+.llbar.you i{background:var(--you)}
+.llbar.you + b{color:var(--you)}
+
+/* 並行ロードマップ */
+table.rm{width:100%;min-width:760px;border-collapse:separate;border-spacing:0;font-size:13px;table-layout:fixed}
+.rm th,.rm td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left;line-height:1.5}
+.rm thead th{font-size:12px;color:var(--muted);font-weight:700}
+.rm th:first-child{width:150px}
+.rm .rm-lane{font-weight:700;color:var(--ink);font-size:13px}
+.rm td.empty{color:var(--line)}
+.rm .now{background:var(--accent-soft)}
+.rm thead th.now{color:var(--accent)}
+.rm-now{display:inline-block;margin-left:6px;font-size:11px;background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:0 6px}
+.rm .ph{font-size:12px;border-bottom:2px solid var(--line);padding-bottom:6px}
+.rm .ph1{color:var(--accent);border-bottom-color:var(--accent)}
+.rm .ph2{color:var(--you);border-bottom-color:var(--you)}
+.rm-notes{margin:4px 0 0;padding-left:1.2em;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+
+/* ガント */
+.gt{overflow-x:auto;margin:0 -4px;padding:0 4px}
+.gt-in{min-width:780px}
+.gt-row{display:grid;grid-template-columns:300px minmax(0,1fr);column-gap:12px;align-items:stretch;border-bottom:1px solid var(--line)}
+.gt-name{display:flex;gap:10px;align-items:center;min-width:0;padding:4px 0}
+.gt-name input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.gt-title{border:0;background:none;text-align:left;padding:6px 0;min-width:0;font-size:14px;line-height:1.45;color:var(--ink);cursor:pointer}
+.gt-title:hover{color:var(--accent)}
+.gt-title small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.gt-title .late-t{color:var(--bad);font-weight:700}
+.gt-title .soon-t{color:var(--warn);font-weight:700}
+.gt-track{position:relative;min-height:54px;background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:10% 100%}
+.gt-bar{position:absolute;top:50%;height:14px;margin-top:-7px;border-radius:7px;background:var(--both)}
+.gt-bar.me{background:var(--accent)}.gt-bar.you{background:var(--you)}
+.gt-row.late .gt-bar{background:var(--bad)}
+.gt-row.done .gt-bar{opacity:.28}
+.gt-row.done .gt-title{color:var(--muted);text-decoration:line-through}
+.gt-today{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--warn);z-index:1}
+.gt-p{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed var(--accent);z-index:1}
+.gt-head{border-bottom:1px solid var(--line)}
+.gt-head .gt-track{min-height:44px}
+.gt-weeks{display:grid;grid-template-columns:repeat(10,1fr);font-size:11px;color:var(--muted);padding-top:22px}
+.gt-weeks span{padding-left:4px;white-space:nowrap}
+.gt-tag{position:absolute;top:2px;transform:translateX(-50%);font-size:11px;font-weight:700;padding:0 6px;border-radius:4px;white-space:nowrap;z-index:2}
+.gt-tag.today{background:var(--warn-soft);color:var(--warn)}
+.gt-tag.p{background:var(--accent-soft);color:var(--accent)}
+.gt-edit{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:10px 12px;margin:0 0 8px;background:var(--sunk);border:1px solid var(--line);border-radius:10px}
+.gt-edit .lbl{font-size:13px;color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.gt-foot{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between}
+.srow{display:grid;gap:6px;align-items:center;padding:4px 0}
+.srow.h{font-size:12px;color:var(--muted);font-weight:700;padding-bottom:0}
+select.txt{appearance:auto}
+.q-st{flex:none;display:flex;align-items:center;gap:8px}
+.q-head h3{font-size:18px}
+.q.collapsed .q-head{padding-bottom:8px}
+.q.collapsed h3::before{content:"✓";display:inline-block;margin-right:8px;color:var(--ok)}
+.q-sum{padding:0 18px 14px;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.q-sum span{font-size:13px;border-radius:99px;background:var(--ok-soft);color:var(--ok);padding:3px 10px;max-width:100%}
+.mini{border:0;background:none;color:var(--accent);font-size:13px;padding:6px 2px;min-height:36px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.memo-wrap{padding:0 18px 14px;background:var(--sunk)}
+.opin{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;align-items:center}
+.opin .who{font-size:12px}
+.opin.concl{padding-top:8px;border-top:1px dashed var(--line)}
+.opin.concl .who{color:var(--accent)}
+.tagrows{display:flex;flex-direction:column;gap:8px}
+.tagrows .opin + .opin{padding-top:8px;border-top:1px dashed var(--line)}
+.seg-b.custom{border-style:dashed}
+.seg-b.add-chip{border-style:dashed;border-color:var(--accent);color:var(--accent);background:transparent}
+.chip-x{display:inline-flex;align-items:center}
+.chip-x .x{border:0;background:none;color:var(--muted);min-width:30px;min-height:36px;margin-left:-2px;font-size:15px;border-radius:8px}
+.chip-x .x:hover{color:var(--bad);background:var(--bad-soft)}
+.add-inline{display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center}
+.add-inline .txt{width:220px;max-width:100%;min-height:38px}
+.add-inline .btn{min-height:38px;padding:6px 14px}
+.other-in{max-width:380px;margin-top:8px;display:block}
+.intro{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
+.intro ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.intro .row-btns{display:flex;justify-content:flex-end}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+.pager button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:10px 18px;min-height:44px;font-size:14px}
+.pager button.next{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);margin-left:auto}
+.sm-card{padding:10px 0;border-bottom:1px solid var(--line)}
+.sm-card:last-child{border-bottom:0}
+.sm-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sm-card ul{margin:6px 0 0;padding-left:1.2em;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.sm-tools{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:16px}
+.copybox{width:100%;min-height:220px;font-size:13px}
+.tk-group{margin-top:16px}.tk-group:first-child{margin-top:0}
+.tk-gh{display:flex;align-items:baseline;gap:10px;font-size:13px;font-weight:700;color:var(--ink);border-bottom:2px solid var(--line);padding-bottom:4px}
+.tk-gh span{font-weight:400;color:var(--muted);font-size:12px}
+.tk-list{list-style:none;margin:0;padding:0}
+.tk-item{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line)}
+.tk-item input{width:20px;height:20px;margin-top:3px;flex:none;accent-color:var(--accent)}
+.tk-t{border:0;background:none;text-align:left;padding:0;font-size:15px;color:var(--ink);line-height:1.5;cursor:pointer;min-height:28px}
+.tk-t small{display:block;font-size:12px;color:var(--muted)}
+.tk-item.done .tk-t{color:var(--muted);text-decoration:line-through}
+.tk-none{font-size:13px;color:var(--muted);padding:6px 0}
+.tk-cand{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tk-cand .add-chip{font-size:13px;min-height:34px}
+.tk-cand .add-chip.both{border-style:solid;border-color:var(--both)}
+.mt-h{font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 2px;letter-spacing:.04em}
+.mt-h:first-child{margin-top:0}
+.mt-row{padding:8px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.mt-row:last-of-type{border-bottom:0}
+.mt-name{font-size:14px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mt-name small{font-weight:400;color:var(--muted)}
+.mt-side{display:grid;grid-template-columns:4.5em 1fr;gap:8px;align-items:start}
+.mt-side .who{font-size:12px;color:var(--muted);padding-top:4px}
+.mt-chip{display:inline-block;border-radius:99px;padding:3px 10px;font-size:13px;margin:0 6px 6px 0;border:1px solid var(--line);background:var(--sunk)}
+.mt-chip.both{border:2px solid var(--both);background:var(--surface);font-weight:600}
+.mt-chip.me{border-color:var(--accent)}.mt-chip.you{border-color:var(--you)}
+.mt-q{margin:0 0 4px;font-size:14px;white-space:pre-wrap}
+.mt-notes{margin:12px 0 0;padding-left:1.2em;font-size:14px;display:flex;flex-direction:column;gap:4px}
+.hint{color:var(--muted);font-size:13px;margin:4px 0 0;max-width:68ch}
+.q-body{padding:12px 18px 16px;display:flex;flex-direction:column;gap:14px}
+.q-foot{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:10px 18px;background:var(--sunk);border-top:1px solid var(--line);font-size:13px}
+.q-foot .lbl{color:var(--muted)}
+.q-foot .at{margin-left:auto;color:var(--muted);font-size:12px}
+.q[data-st="ok"]{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}
+.q[data-st="tmp"]{border-color:color-mix(in srgb,var(--warn) 45%,var(--line))}
+
+/* segmented + chips */
+.seg{display:inline-flex;flex-wrap:wrap;gap:6px}
+.seg-b{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;min-height:40px;font-size:14px}
+.seg-b:hover{border-color:var(--accent)}
+.seg-b[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.st .seg-b[data-val="ok"][aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.st .seg-b[data-val="tmp"][aria-pressed="true"]{background:var(--warn);border-color:var(--warn);color:var(--surface)}
+.st .seg-b[data-val="hold"][aria-pressed="true"]{background:var(--hold);border-color:var(--hold);color:var(--surface)}
+.seg.sm .seg-b{padding:4px 11px;min-height:36px;font-size:13px}
+.chip{display:inline-block;font-size:12px;padding:1px 9px;border-radius:99px;background:var(--hold-soft);color:var(--hold);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}.chip.tmp{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}.chip.acc{background:var(--accent-soft);color:var(--accent)}
+
+/* inputs */
+.num,.txt,.area,.date{border:1px solid var(--line);background:var(--sunk);border-radius:8px;padding:8px 10px;min-height:42px;width:100%}
+.num{text-align:right;font-variant-numeric:tabular-nums;font-size:16px}
+.num:focus,.txt:focus,.area:focus,.date:focus{background:var(--surface);border-color:var(--accent);outline:none}
+.area{resize:none;min-height:64px;line-height:1.6;font-size:15px}
+.date{width:auto;min-height:36px;padding:4px 8px}
+.unit{display:flex;align-items:center;gap:6px}
+.unit span{color:var(--muted);font-size:13px;white-space:nowrap}
+.field{display:flex;flex-direction:column;gap:6px}
+.field>label,.field>.flabel{font-size:14px;font-weight:500}
+.field .fhint{font-size:12px;color:var(--muted);margin-top:-2px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.who{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+table.t{width:100%;border-collapse:separate;border-spacing:0;min-width:560px}
+.t th{font-size:12px;color:var(--muted);font-weight:700;text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+.t th:first-child,.t th.l{text-align:left}
+.t td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.t td:first-child{font-size:14px}
+.t td.c{width:130px}
+.t .sub{display:block;font-size:12px;color:var(--muted)}
+.t tr.calc td{background:var(--accent-soft)}
+.t tr.calc td:first-child{font-weight:700}
+.t tr.total td{border-bottom:0;font-weight:700}
+output.v{display:block;text-align:right;font-variant-numeric:tabular-nums;font-size:16px;font-weight:700;color:var(--accent);padding:8px 10px}
+output.v.neg{color:var(--bad)}
+output.v.empty{color:var(--muted);font-weight:400}
+.each{display:block;text-align:right;color:var(--muted);font-size:13px;padding:8px 10px}
+.callout{border-radius:10px;background:var(--sunk);border:1px dashed var(--line);padding:10px 12px;font-size:13px;color:var(--muted)}
+.callout b{color:var(--ink)}
+.result{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline;padding:10px 12px;border-radius:10px;background:var(--accent-soft)}
+.result .k{font-size:13px;color:var(--muted)}
+.result output{display:inline;font-size:18px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+
+/* rows (担当表・家具・家事) */
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:190px minmax(0,1fr);gap:8px 14px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.row:last-child{border-bottom:0}
+.row .name{font-weight:500;padding-top:6px}
+.row .name small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.row .ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;min-width:0}
+.row .ctl .unit{width:150px}
+.row .ctl .txt{flex:1;min-width:160px}
+.row.off .unit{opacity:.4}
+.rows .sect{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;padding:14px 0 2px;border-bottom:1px solid var(--line)}
+.rows .sect:first-child{padding-top:0}
+.checks{display:flex;flex-direction:column;gap:2px}
+.ck{display:flex;align-items:center;gap:12px;padding:8px 4px;border-radius:8px;min-height:44px}
+.ck:hover{background:var(--sunk)}
+.ck input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+
+/* 家事の分担 */
+.hw-row{display:grid;grid-template-columns:190px minmax(0,1fr) 150px 150px;gap:8px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.hw-row .unit{max-width:200px}
+.hw-x{justify-content:flex-end}
+.hw-row .name{font-weight:500}
+.hw-row .name small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.hw-row .name .txt{font-weight:400}
+.hw-slider{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;min-width:0}
+.hw-who{font-size:12px;color:var(--muted);white-space:nowrap;display:flex;align-items:baseline;gap:4px}
+.hw-who output{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;min-width:2.8em;text-align:center}
+.hw-who.me output{color:var(--accent)}
+.hw-who.you output{color:var(--you)}
+input[type=range]{width:100%;min-width:0;height:34px;accent-color:var(--accent);margin:0}
+input[type=range].unset{opacity:.35}
+.hw-x{display:flex;gap:6px;align-items:center}
+.hw-x .seg-b{padding:4px 11px;min-height:36px;font-size:13px}
+.hwsum{display:flex;flex-direction:column;gap:8px}
+.hwsum-row{display:grid;grid-template-columns:130px minmax(0,1fr) 3.5em;gap:12px;align-items:center;font-size:14px}
+.hwsum-row output{text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.hwbar{height:12px;border-radius:6px;background:var(--you-soft);overflow:hidden}
+.hwbar i{display:block;height:100%;background:var(--accent);width:0}
+.hwbar.empty{background:var(--line)}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+
+/* payments */
+.pay{display:grid;grid-template-columns:minmax(0,2fr) 110px 120px minmax(0,1fr) minmax(0,1fr) 40px;gap:6px;align-items:center}
+.pay.h{font-size:12px;color:var(--muted);font-weight:700}
+.del{border:0;background:transparent;color:var(--muted);min-height:40px;border-radius:8px}
+.del:hover{color:var(--bad);background:var(--bad-soft)}
+.add{align-self:flex-start;border:1px dashed var(--accent);color:var(--accent);background:transparent;border-radius:99px;padding:6px 14px;min-height:40px}
+
+/* flow / timeline */
+.tl{display:flex;flex-direction:column}
+.ms{display:grid;grid-template-columns:150px 18px minmax(0,1fr);gap:0 14px;align-items:start}
+.ms .when{padding-top:4px}
+.ms .when input{font-weight:700;font-size:15px;background:transparent;border:1px solid transparent;border-radius:6px;padding:2px 6px;width:100%;font-variant-numeric:tabular-nums}
+.ms .when input:hover{border-color:var(--line)}
+.ms .when input:focus{border-color:var(--accent);background:var(--surface);outline:none}
+.ms .dot{position:relative;align-self:stretch}
+.ms .dot::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--line)}
+.ms:first-child .dot::before{top:12px}.ms:last-child .dot::before{bottom:calc(100% - 12px)}
+.ms .dot::after{content:"";position:absolute;left:3px;top:8px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:2px solid var(--line)}
+.ms[data-st="ok"] .dot::after{background:var(--ok);border-color:var(--ok)}
+.ms[data-st="tmp"] .dot::after{border-color:var(--warn)}
+.ms.key .dot::after{width:16px;height:16px;left:1px;top:6px}
+.ms .what{padding:2px 0 18px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.ms .what b{font-size:16px;font-family:var(--f-display)}
+.ms .what .note{flex-basis:100%;font-size:13px;color:var(--muted)}
+.known{display:flex;flex-wrap:wrap;gap:8px}
+.known span{border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:14px;background:var(--sunk)}
+.progress{display:flex;flex-direction:column;gap:14px}
+.pg-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.pg-label{font-size:12px;font-weight:700;color:var(--muted)}
+.pg{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--surface)}
+.pg:hover{border-color:var(--accent)}
+.pg b{font-size:14px}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--line)}
+.bar i{display:block}.bar .ok{background:var(--ok)}.bar .tmp{background:var(--warn)}.bar .hold{background:var(--hold)}
+.pg small{color:var(--muted);font-size:12px}
+
+/* self mode */
+.self-hero{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;padding:20px 22px;border-radius:var(--r);background:var(--self-soft);border:1px solid color-mix(in srgb,var(--self) 30%,var(--line));margin-bottom:18px}
+.self-hero .cd{font-family:var(--f-display);font-size:15px}
+.self-hero .cd b{font-size:46px;line-height:1;color:var(--self);font-variant-numeric:tabular-nums;margin:0 4px}
+.self-hero .pd{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+.self-hero .grow{flex:1}
+.exit{background:var(--self);color:var(--surface);border:0;border-radius:99px;padding:10px 18px;min-height:44px;font-weight:700}
+.task{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:10px 4px;border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:0}
+.task input{width:22px;height:22px;margin-top:2px;accent-color:var(--self)}
+.task .tt{font-size:15px}
+.task .tt small{display:block;color:var(--muted);font-size:12px}
+.task.done .tt{color:var(--muted);text-decoration:line-through}
+.task .due{font-size:12px;text-align:right;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.task .id{font-size:11px;color:var(--muted);letter-spacing:.04em}
+details.grp{border-top:1px solid var(--line)}
+details.grp:first-of-type{border-top:0}
+details.grp summary{display:flex;align-items:center;gap:10px;padding:12px 4px;min-height:44px;cursor:pointer;font-weight:700;list-style:none}
+details.grp summary::-webkit-details-marker{display:none}
+details.grp summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s}
+details.grp[open] summary::before{transform:rotate(45deg)}
+details.grp summary small{color:var(--muted);font-weight:400;font-size:12px;margin-left:auto}
+
+/* overlay */
+.ov{position:fixed;inset:0;z-index:20;background:color-mix(in srgb,var(--ink) 45%,transparent);display:flex;align-items:center;justify-content:center;padding:16px}
+.sheet{background:var(--surface);border-radius:16px;padding:22px;width:min(360px,100%);display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.sheet h3{font-size:18px}
+.sheet p{margin:0;color:var(--muted);font-size:13px}
+.dots{display:flex;gap:14px;justify-content:center;padding:6px 0}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--self)}
+.dots i.on{background:var(--self)}
+.dots.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pad button{min-height:56px;border-radius:12px;border:1px solid var(--line);background:var(--sunk);font-size:22px;font-variant-numeric:tabular-nums}
+.pad button:active{background:var(--self-soft)}
+.pad .ghost{border:0;background:transparent;font-size:14px;color:var(--muted)}
+.sheet .row-btns{display:flex;gap:8px;justify-content:flex-end}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 16px;min-height:40px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.err{color:var(--bad);font-size:13px;min-height:1.2em;text-align:center}
+
+@media (max-width:860px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:14px}
+  .rail{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px;margin:0 -4px}
+  .rail-group{flex-direction:row;gap:6px;align-items:center}
+  .rail-label{white-space:nowrap}
+  .rail-label span{display:none}
+  .tab{width:auto;white-space:nowrap;border:1px solid var(--line);min-height:40px;padding:6px 12px}
+  .tab .meter{display:none}
+}
+@media (max-width:560px){
+  .brand h1{font-size:17px}
+  .saved{display:none}
+  .icon-btn .lbl-t{display:none}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+  .row{grid-template-columns:minmax(0,1fr)}
+  .row .name{padding-top:0}
+  .ms{grid-template-columns:96px 18px minmax(0,1fr);gap:0 8px}
+  .pay{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .hw-row{grid-template-columns:minmax(0,1fr)}
+  .hw-x{justify-content:flex-start}
+  .opin{grid-template-columns:minmax(0,1fr)}
+  .srow{grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;padding:8px 0;border-bottom:1px solid var(--line)}
+  .srow.h{display:none}
+  .gt-in{min-width:640px}
+  .gt-row{grid-template-columns:170px minmax(0,1fr)}
+  .hwsum-row{grid-template-columns:90px minmax(0,1fr) 3.5em}
+  .pay.h{display:none}
+  .topic-head h2{font-size:22px}
+  .self-hero .cd b{font-size:38px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><h1>結婚準備ノート</h1><span class="mode" id="modeLabel">ふたりで見る</span></div>
+    <span class="saved" id="saved" aria-live="polite"></span>
+    <button class="icon-btn" id="btnNames" type="button" aria-label="呼び方を変える">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.6.1 4.4 1.8 5 4.9"/></svg>
+      <span class="lbl-t">呼び方</span>
+    </button>
+    
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" id="rail" aria-label="話題"></nav>
+  <main id="main"></main>
+</div>
+
+<div id="overlay"></div>
+
+<script>
+(() => {
+'use strict';
+// 'main'＝二人で見る版、'you'＝{you}に渡す版（{you}の欄だけ）。build.py が書き換える
+const EDITION = 'main';
+const SOLO = EDITION === 'you';
+const LS = SOLO ? 'kn-y-' : 'kn-';  // 同じブラウザで両方を開いても混ざらないように
+
+/* ================= 話題の定義（骨組み。記入内容は端末に保存） ================= */
+const STATUS = [['ok','決定'],['tmp','仮'],['hold','保留']];
+const WHO3 = [['me','{me}'],['you','{you}'],['both','二人で']];
+
+// 費目ごとの担当表。数字のページはこのルールで負担を振り分ける
+const RULE_OPTS = [['base','基本どおり'],['half','折半'],['ratio','比率'],['me','{me}'],['you','{you}'],['each','各自']];
+const RULE_ITEMS = [
+  {sect:'毎月の支出'},
+  ['rent','家賃・管理費'],['util','光熱費・ネット'],['food','食費・日用品'],['out','二人の外食・お出かけ'],
+  ['irr','不定期費の積立','更新料・保険・家電の買い替えなど'],['save','二人の将来の貯金'],
+  {sect:'最初にかかるお金'},
+  ['start','新居の初期費用・引越し'],['furn','家具・家電'],['wed','結婚指輪・顔合わせ・前撮り・挙式'],['trip','旅行・新婚旅行'],
+  {sect:'そのほか'},
+  ['family','親族の行事・贈り物'],['personal','服・趣味・個人の交際費']
+];
+const RULE_ROWS = RULE_ITEMS.filter(r => Array.isArray(r));
+const MONTHLY = ['rent','util','food','out','irr','save'];
+
+const FLOW = [
+  {id:'m1', when:'11月', what:'{you}の親への紹介・新居の比較', note:'内見は比較と採寸のため。申込は入居日が決まってから。'},
+  {id:'m1b', when:'12/5（土）昼', what:'{me}の親と食事', note:'お店は{you}と早めに相談して予約。'},
+  {id:'m2', when:'12/19（土）', what:'プロポーズ（目安）', key:true},
+  {id:'m3', when:'12〜1月', what:'成婚退会', note:'各相談所の締切・成婚料に合わせる。'},
+  {id:'m4', when:'1〜2月', what:'結婚の報告・両家顔合わせ'},
+  {id:'m5', when:'2〜3月', what:'新居の申込・審査・契約', note:'旧居の解約は、新居と入居日が決まってから。'},
+  {id:'m6', when:'3月', what:'入籍（婚姻届の提出）', key:true, note:'挙式の日程とは別に決める。'},
+  {id:'m7', when:'4月', what:'同居スタート', key:true, note:'春は引越しの繁忙期。見積は早めに。'},
+  {id:'m8', when:'未定', what:'前撮り・挙式・旅行', note:'プロポーズのあとに日程を相談。'}
+];
+// 12/19（プロポーズ目安）までのやること。元は marriage_plan_v3.pdf p.2「直近10週強」。
+// ここには二人で見てよいやることだけを置く
+const GANTT_FROM = '2026-10-26', GANTT_WEEKS = 10, P_TARGET = '2026-12-19';
+const FLOW_TASKS = [
+  {id:'A01', cat:'agency', t:'各相談所に、成婚の条件・申請締切・成婚料を確認', s:'2026-10-22', e:'2026-10-31', who:'each'},
+  {id:'F01', cat:'family', t:'{me}の親に報告し、紹介の候補日をもらう', s:'2026-10-22', e:'2026-10-31', who:'me', done:true},
+  {id:'F08', cat:'family', t:'{me}の親と会うお店を{you}と相談して予約（12/5 昼）', s:'2026-10-28', e:'2026-11-08', who:'both'},
+  {id:'F02', cat:'family', t:'{you}の親への紹介日・場所・参加者を調整', s:'2026-10-26', e:'2026-11-08', who:'you'},
+  {id:'F04', cat:'family', t:'祖父母への顔見せの有無とタイミングを確認', s:'2026-10-26', e:'2026-11-08', who:'you'},
+  {id:'H0V', cat:'home', t:'流山おおたかの森を下見（駅まわり・スーパー・通勤の動線）', s:'2026-11-01', e:'2026-11-15', who:'both'},
+  {id:'K01', cat:'home', t:'家具・家電をふらっと見に行く（ニトリ・IKEA・家電量販店など）', s:'2026-11-01', e:'2026-11-29', who:'both', go:'furn'},
+  {id:'H00', cat:'money', t:'家賃・初期費用・同居を始める月の目安を置く', s:'2026-10-26', e:'2026-11-08', who:'both', go:'start'},
+  {id:'B01', cat:'money', t:'結婚準備費の上限と、支払いの予定を書き出す', s:'2026-10-26', e:'2026-11-15', who:'me', go:'start'},
+  {id:'N00', cat:'talk', t:'「どんな夫婦でいたいか」を話す（10/31 デート）', s:'2026-10-28', e:'2026-10-31', who:'both', go:'couple'},
+  {id:'N0', cat:'talk', t:'5つの愛の言語を一緒にやってみる（10/31 デート）', s:'2026-10-28', e:'2026-10-31', who:'both', go:'love'},
+  {id:'N1', cat:'talk', t:'ノート第1段の残り（どんな家庭・暮らしの楽しみ・方針）を話す', s:'2026-10-28', e:'2026-11-15', who:'both', go:'vision'},
+  {id:'N2', cat:'talk', t:'「プロポーズのこと」のページを埋める', s:'2026-10-28', e:'2026-11-08', who:'you', go:'propose'},
+  {id:'F03Y', cat:'family', t:'{you}の親に紹介', s:'2026-11-09', e:'2026-11-29', who:'both'},
+  {id:'F07', cat:'family', t:'手土産を用意する（12/5 用）', s:'2026-11-23', e:'2026-12-04', who:'both'},
+  {id:'F09', cat:'family', t:'{me}の親と食事（12/5 土曜の昼）', s:'2026-12-05', e:'2026-12-05', who:'both'},
+  {id:'H01', cat:'home', t:'物件を比較して内見・採寸（仕事部屋・回線・周辺も）', s:'2026-11-09', e:'2026-11-29', who:'both'},
+  {id:'N3', cat:'talk', t:'お金のルール（財布の形・分け方・担当表）を話す', s:'2026-11-09', e:'2026-11-29', who:'both', go:'mrule'},
+  {id:'F05', cat:'family', t:'祖父母に顔見せ（必要な形で）', s:'2026-11-16', e:'2026-12-06', who:'both'},
+  {id:'A02', cat:'agency', t:'二人の結婚の意思を確認し、相談所と最終調整', s:'2026-11-30', e:'2026-12-12', who:'both'},
+  {id:'C01', cat:'agency', t:'プロポーズのあと：成婚報告・退会申請・成婚料の支払い', s:'2026-12-20', e:'2026-12-31', who:'each'}
+];
+const WHO4 = [['me','{me}'],['you','{you}'],['both','二人で'],['each','各自']];
+// やること一覧のグループ。分類のない（ガントから足した）ものは「そのほか」
+const TASK_CATS = [['talk','二人で話すこと'],['family','家族'],['home','新居・家具'],['money','お金'],['agency','相談所'],['date','デート・二人の時間'],['other','そのほか']];
+// 抜けていそうなこと。タップで一覧に入る（入れたものは候補から消える）
+const TASK_CAND = [
+  {cat:'talk', t:'将来のこと（子ども・仕事・住む場所）のページを話す', go:'future'},
+  {cat:'talk', t:'家族・親戚づきあいのページを話す', go:'family'},
+  {cat:'talk', t:'暮らし・家事のルールのページを話す', go:'lrule'},
+  {cat:'family', t:'{you}の親への手土産を用意する'},
+  {cat:'family', t:'12/5 の服装・話すこと・当日の流れを確認する'},
+  {cat:'family', t:'年末年始の過ごし方（それぞれの実家・二人で）を決める'},
+  {cat:'home', t:'今の家の解約条件（予告期間・違約金）をそれぞれ確認する', who:'each'},
+  {cat:'money', t:'お互いのお金の状況（貯金・借入・保険）を見せ合う'},
+  {cat:'agency', t:'カウンセラーに交際の様子を伝える', who:'each'},
+  {cat:'date', t:'12/19〜20 の予定を空けておく'},
+  {cat:'date', t:'クリスマスの過ごし方を決める'}
+];
+const DATE_IDEAS = [['illumi','イルミネーション'],['xmas','クリスマスマーケット'],['autumn','紅葉を見に行く'],['onsen','日帰り温泉'],['gourmet','食べ歩き'],['cafe','カフェめぐり'],
+  ['museum','美術館・博物館'],['aqua','水族館・動物園'],['movie','映画'],['drive','ドライブ'],['cook','おうちデート'],['walk','新居の街を散歩'],['shop','家具・雑貨を見に行く'],['theme','テーマパーク']];
+
+// 5つの愛の言語（ゲーリー・チャップマン, 1992）。ミニ診断は5言語の総当たり10問＝各言語4回
+const LANGS = [
+  {id:'words',   n:'肯定的な言葉',   d:'言葉で愛情や感謝を伝えられると嬉しい', ex:'「いつもありがとう」「一緒にいられて幸せ」', tip:'「ありがとう」「好き」を言葉にする。LINEの一言でも届く'},
+  {id:'time',    n:'一緒に過ごす時間', d:'自分のために時間を使ってくれると嬉しい', ex:'スマホを置いてゆっくり話す、休日に出かける', tip:'二人の予定を先に入れる。会っているときはスマホを置いて向き合う'},
+  {id:'gifts',   n:'プレゼント',     d:'自分を思い出して選んでくれたことが嬉しい', ex:'お土産、好きなお菓子、記念日の贈り物', tip:'高価なものより「思い出して選んだ」小さな物。お土産や好きなお菓子'},
+  {id:'service', n:'行動・奉仕',     d:'自分のために動いてくれると嬉しい', ex:'疲れた日の家事、デートの計画、困りごとの解決', tip:'家事を先回りする、段取りや予約を引き受ける、困りごとを一緒に片づける'},
+  {id:'touch',   n:'スキンシップ',   d:'触れ合いで安心や愛情を感じる', ex:'手をつなぐ、ハグ、肩を寄せて座る', tip:'手をつなぐ、ハグ、隣に座る。お互いが心地よい範囲で'}
+];
+const LANG = Object.fromEntries(LANGS.map(l => [l.id, l]));
+const OFFICIAL_SEED = {};
+const LOVE_Q = [
+  {q:'仕事で疲れた日に、どちらが嬉しい？',   a:['words','「いつも頑張ってるね」と言ってもらう'], b:['service','夕食を用意してもらう']},
+  {q:'休日に、どちらが嬉しい？',             a:['time','二人でのんびり話す時間をつくる'],     b:['gifts','好きなものをプレゼントしてもらう']},
+  {q:'デート中、どちらが嬉しい？',           a:['words','「一緒にいると楽しい」と言ってもらう'], b:['touch','自然に手をつないでもらう']},
+  {q:'久しぶりに会う日に、どちらが嬉しい？', a:['words','「会いたかった」と言われる'],         b:['gifts','ちょっとしたお土産をもらう']},
+  {q:'家でくつろいでいるとき、どちらが嬉しい？', a:['time','スマホを置いて話を聞いてもらう'],   b:['words','「そういうところ好き」と言われる']},
+  {q:'忙しい週に、どちらが嬉しい？',         a:['service','予定や予約を全部まかせられる'],      b:['time','短くても電話で話す時間をつくってくれる']},
+  {q:'寝る前に、どちらが嬉しい？',           a:['time','今日あったことをゆっくり話す'],         b:['touch','おやすみのハグ']},
+  {q:'記念日に、どちらが嬉しい？',           a:['gifts','手紙と小さな贈り物'],                 b:['service','行きたかった場所への計画を立ててくれる']},
+  {q:'誕生日に、どちらが嬉しい？',           a:['touch','ぎゅっとハグしてもらう'],             b:['gifts','自分のために選んだプレゼント']},
+  {q:'落ち込んだときに、どちらが嬉しい？',   a:['service','用事を代わりに片づけてもらう'],     b:['touch','そっと寄り添ってもらう']}
+];
+
+const KNOWN = ['流山おおたかの森','2LDK','通勤OK','独立した仕事部屋','前撮りは和装＋洋装','式はディズニーで少人数','ドレスは持ち込みたい（外部レンタルの想定）',
+  ];
+
+// 並行ロードマップ（〜2027年）。プロポーズまで＝結婚するための準備、プロポーズ後＝結婚生活を始めるための準備。
+// プロポーズの行は二人で見てよい範囲だけ
+const RM_COLS = ['10〜11月','12月','1〜2月','3〜4月','5月以降'];
+const ROADMAP = [
+  ['家族',             ['{me}の親に報告（済）・{you}の親への紹介・祖父母の顔見せ（有無とタイミング）','12/5 {me}の親と食事・正式な結婚報告','両家顔合わせ','',''],],
+  ['プロポーズ',       ['「プロポーズのこと」で好みを聞く','12/19 目安','','',''],],
+  ['相談所',           ['成婚の条件・手順を確認','成婚退会（各相談所の締切内）','','',''],],
+  ['新居',             ['家賃・入居月の目安／流山の下見／内見','募集状況を見る（参考2物件を基準に）','申込・契約','引越し・同居（4月目安）',''],],
+  ['家具・家電',       ['ふらっと見る・持ち物の写真と寸法','','買う物を決める','注文・搬入',''],],
+  ['お金・暮らし',     ['このノートで方針とルールを話す','','初期費用・家計を決める','支払いの設定','1か月後・3か月後に見直し'],],
+  ['入籍',             ['','','必要書類の確認・準備','入籍（3月目安）・名義変更',''],],
+  ['結婚指輪',         ['','','二人で選ぶ・注文','受け取り',''],],
+  ['前撮り（和装・洋装）', ['','','撮影会社を比較','衣装を選んで予約','撮影'],],
+  ['結婚式（ディズニー少人数）', ['','ドレスの希望を確認','プラン比較・ドレス持込の条件確認・見学','式場・日程を決めて契約','準備・挙式（時期は未定）'],],
+  ['新婚旅行',         ['','','行き先・予算を考える','予約','旅行（式・同居と同じ月は避ける）'],]
+];
+
+// 家事の分担（{me}の割合を%で持つ。残りが{you}）
+const HW_CATS = [
+  {id:'meal', name:'食事', tasks:[['menu','献立を考える'],['shop','買い出し・ネットスーパー'],['cookW','平日の夕食づくり'],['cookH','休日の食事'],['dish','後片付け・食器洗い'],['stock','冷蔵庫・食材の在庫管理']]},
+  {id:'laundry', name:'洗濯', tasks:[['wash','洗濯機を回す'],['dry','干す・取り込む・乾燥機'],['fold','たたむ・しまう'],['sheet','シーツ・寝具・タオルの交換'],['iron','アイロン・クリーニング']]},
+  {id:'clean', name:'掃除', tasks:[['living','リビング・寝室'],['kitchen','キッチン・コンロまわり'],['bath','お風呂'],['toilet','トイレ・洗面所'],['floor','床・掃除機'],['deep','窓・換気扇など月1回の掃除']]},
+  {id:'trash', name:'ゴミ・日用品', tasks:[['sort','ゴミの分別・まとめる'],['out','ゴミ出し（回収日）'],['recycle','資源ごみ・段ボール'],['supply','日用品の補充・買い置き']]},
+  {id:'admin', name:'家計・手続き', tasks:[['pay','支払い・家計の記録'],['mail','郵便・書類・役所の手続き'],['repair','修理・管理会社や業者とのやりとり'],['net','ネット・家電の設定']]},
+  {id:'hidden', name:'名もなき家事', hint:'目に見えにくいけれど、時間と気をつかう家事。ここも割合に入れます。',
+   tasks:[['notice','足りない物・汚れに気づく'],['plan','予定・行事の段取り'],['family','親族への連絡・贈り物'],['guest','来客の準備']]}
+];
+
+const GROUPS = [
+  {id:1, name:'第1段', label:'理想と方針'},
+  {id:2, name:'第2段', label:'ルール'},
+  {id:3, name:'第3段', label:'数字と細部'},
+  {id:9, name:'', label:'予定'}
+];
+
+const TOPICS = [
+  /* ---------- 第1段：理想と方針 ---------- */
+  // 二人の関係そのものを言葉にするページ。答えを急がせない
+  {id:'couple', g:1, label:'どんな夫婦でいたいか', title:'どんな夫婦でいたいか',
+   lead:'家庭や暮らしの話の前に、二人の関係そのものの話。うまく言葉にならなくても大丈夫です。「まだよくわからない」も立派な答えなので、そのまま選んでください。',
+   cards:[
+    {id:'now', type:'form', title:'いま、一緒にいるときの気持ち',
+     hint:'正解はありません。お互いの今を知るためのカードです。それぞれ近いものを選びます。',
+     fields:[
+      {f:'feel', l:'一緒にいるとき、どんな気持ち？（いくつでも）', tags:[['safe','安心する'],['fun','楽しい'],['natural','自然体でいられる'],['calm','落ち着く'],['glad','会えると嬉しい'],['more','もっと一緒にいたい'],['miss','会えないと少し寂しい'],['doki','ドキドキする'],['care','大切にしたい'],['rely','頼りにしている'],['respect','尊敬している'],['unsure','まだうまく言葉にできない']]},
+      {f:'like', l:'相手の「いいな」と思うところ', pair:true, ph:'例：小さなことでもありがとうと言ってくれるところ',
+       sugg:[['s0','優しい'],['s1','話しやすい'],['s2','気づかいができる'],['s3','笑顔'],['s4','価値観が近い'],['s5','一緒にいて楽'],['s6','誠実'],['s7','頼りになる'],['s8','面白い'],['s9','努力家'],['s10','食の好みが合う'],['s11','家族を大切にしている']]}]},
+    {id:'kind', type:'form', title:'結婚してから、どんな夫婦でいたい？',
+     fields:[
+      {f:'type', l:'近いイメージ（いくつでも）', tags:[['lover','恋人みたいな夫婦'],['friend','親友みたいな夫婦'],['team','家族・チームみたいな夫婦'],['indep','お互い自立した夫婦'],['always','いつも一緒の夫婦'],['respect','尊敬し合える夫婦'],['amae','甘えられる夫婦'],['talk','なんでも話せる夫婦'],['laugh','笑ってばかりの夫婦'],['calm','おだやかな夫婦']]},
+      {f:'keep', l:'結婚してからも続けたいこと（いくつでも）', tags:[['date','二人でデート'],['hand','手をつなぐ'],['hug','ハグ'],['suki','「好き」を言葉にする'],['thanks','「ありがとう」を言葉にする'],['greet','おはよう・おやすみ'],['anniv','記念日を祝う'],['sofa','隣でのんびり'],['night','寝る前に今日の話'],['trip','二人で旅行'],['photo','写真を残す'],['letter','手紙を書く']]},
+      {f:'image', l:'ひとことで言うと、どんな夫婦？', pair:true, ph:'例：おじいちゃんおばあちゃんになっても手をつないで散歩する夫婦'}]},
+    {id:'pace', type:'form', title:'距離感とペース', private:true,
+     hint:'どれくらいの距離感が心地いいかは人それぞれ。合わせるためではなく、知っておくためのカードです。言える範囲でOK。このカードは「まとめ」のコピーには出しません。',
+     fields:[
+      {f:'touch', l:'心地いいこと（いくつでも）', tags:[['hand','手をつなぐ'],['arm','腕を組む'],['close','くっついて座る'],['lean','寄りかかる'],['hug','ハグ'],['pat','頭をなでる'],['out','外でも手をつなぎたい'],['home','家の中だけがいい']]},
+      {f:'way', l:'これからの距離の縮め方（いくつでも）', tags:[['closer','もっと仲良くなっていきたい'],['now','今くらいが心地いい'],['slow','ゆっくり慣れていきたい'],['ask','言ってくれたら嬉しい'],['lead','相手から来てくれると嬉しい'],['shy','自分からはまだ照れる'],['unsure','まだよくわからない']]},
+      {f:'sign', l:'照れるとき・気が乗らないときの伝え方', pair:true, ph:'例：恥ずかしいときは、あとでLINEで言うね',
+       sugg:[['s0','あとでLINEで伝える'],['s1','手紙で伝える'],['s2','「今日はやめとく」と言っていい'],['s3','断っても気にしない約束'],['s4','聞かれたら答える'],['s5','合図を決める']]}]},
+    {id:'grow', type:'form', title:'これから二人で育てたいこと',
+     hint:'今の気持ちが完成している必要はありません。これから一緒に育てていきたいものを話します。',
+     fields:[
+      {f:'grow', l:'育てていきたいこと（いくつでも）', tags:[['trust','安心・信頼'],['love','恋人としての気持ち'],['talk','なんでも話せる関係'],['laugh','笑い・楽しさ'],['habit','二人の習慣'],['respect','尊敬し合う気持ち'],['team','チームワーク'],['memory','思い出']]},
+      {f:'check', l:'気持ちを話す機会', opts:[['m1','月1回くらい'],['anniv','記念日に'],['trip','旅行のとき'],['need','気になったらその都度']]},
+      {f:'say', l:'相手に伝えておきたいこと', pair:true, ph:'例：恋愛に慣れていなくても、ゆっくりで大丈夫だよ'}]}
+   ]},
+  {id:'vision', g:1, label:'どんな家庭にしたいか', title:'どんな家庭にしたいか',
+   lead:'条件の前に、二人が思い描いている家庭を話します。正解はないので、思いつくままでOK。キーワードはそれぞれ選んで、重なったところが二人の軸になります。',
+   cards:[
+    {id:'home', type:'form', title:'思い描いている家庭', fields:[
+      {f:'words', l:'家庭のキーワード（いくつでも）', tags:[['calm','おだやか'],['lively','にぎやか'],['team','チームで協力'],['free','お互い自由'],['laugh','笑いが多い'],['talk','なんでも話せる'],['tidy','すっきり片付いた家'],['guest','人が集まる家'],['nature','自然が近い'],['grow','一緒に成長'],['steady','堅実'],['adventure','いろいろ挑戦']]},
+      {f:'image', l:'10年後の、ある休日の朝のイメージ', pair:true, ph:'例：子どもと公園に行って、昼は家でパスタ'},
+      {f:'habit', l:'大事にしたい家族の習慣（いくつでも）', tags:[['s0','誕生日をちゃんと祝う'],['s1','記念日を祝う'],['s2','夕飯はなるべく一緒'],['s3','休日の朝ごはんをゆっくり'],['s4','季節の行事を楽しむ'],['s5','写真を残す'],['s6','年末年始は実家へ'],['s7','手紙やカードを書く'],['s8','寝る前に今日の話をする'],['s9','月1でデート']]},
+      {f:'origin', l:'自分の実家で「真似したいこと」「変えたいこと」', pair:true, ph:'例：夕飯は家族そろって食べる。でも休日の予定は詰めすぎない'}]},
+    {id:'partner', type:'form', title:'お互いに大事にしたいこと',
+     hint:'相手への注文ではなく、「こうしてもらえると嬉しい」を伝え合う時間です。自分ができることも同じ数だけ出します。',
+     fields:[
+      {f:'value', l:'相手に大事にしてほしいこと（いくつでも）', tags:[['honest','正直さ'],['thanks','ありがとうを言う'],['time','二人の時間'],['respect','相手のペースを尊重'],['report','報告・連絡'],['money','お金の感覚'],['family','家族を大切に'],['health','健康に気をつかう'],['humor','笑い・ユーモア'],['try','一緒に努力する']]},
+      {f:'happy', l:'こうしてもらえると嬉しいこと', pair:true, sugg:[['s0','おはよう・おやすみを言う'],['s1','帰る時間を連絡'],['s2','疲れていたら声をかける'],['s3','話を最後まで聞く'],['s4','予定を早めに共有'],['s5','感謝を言葉にする'],['s6','ひとりの時間を尊重'],['s7','家事に気づいて動く'],['s8','記念日を覚えている'],['s9','外でも仲良くする']], ph:'例：疲れているときは先に声をかけてほしい'},
+      {f:'ng', l:'これだけはしないでほしいこと', pair:true, sugg:[['s0','黙って不機嫌になる'],['s1','大事なことの事後報告'],['s2','人前で否定する'],['s3','相談なしの大きな買い物'],['s4','寝る前にケンカを持ち越す'],['s5','ほかの人と比べる'],['s6','約束を忘れる'],['s7','話の途中でスマホを見る']], ph:'例：大事なことを後から知らされるのはつらい'},
+      {f:'give', l:'自分が相手にできること', pair:true, sugg:[['s0','料理'],['s1','朝ごはん担当'],['s2','運転'],['s3','予約・段取り'],['s4','掃除'],['s5','話を聞く'],['s6','笑わせる'],['s7','家計の管理'],['s8','調べもの'],['s9','マッサージ']], ph:'例：休日の朝ごはんは担当する'}]}
+   ]},
+  {id:'love', g:1, label:'愛情の伝え方', title:'愛情の伝え方（5つの愛の言語）',
+   lead:'どんなことをされると「大切にされている」と感じるか、どう気持ちを伝えたいか。受け取り方と伝え方の違いを知って、すれ違いを減らすためのページです。',
+   cards:[
+    {id:'quiz', type:'lovequiz', title:'ミニ診断（10問）',
+     hint:'それぞれ、2つのうち嬉しい方をタップ。公式の診断ではなく、話すきっかけ用のオリジナル問題です。'},
+    {id:'official', type:'loveofficial', title:'公式診断の結果',
+     hint:'公式サイトの結果画面に出る割合（%）を、それぞれ書きます。英語の表示名との対応：Words of Affirmation＝肯定的な言葉、Quality Time＝一緒に過ごす時間、Receiving Gifts＝プレゼント、Acts of Service＝行動・奉仕、Physical Touch＝スキンシップ。'},
+    {id:'talk', type:'form', title:'話してみたい3つのこと',
+     hint:'受け取ると嬉しいことと、自分から伝える方法は同じとは限りません。家族や友だちとの関わりから考えてもOK。',
+     fields:[
+      {f:'receive', l:'何をしてもらうと嬉しい？', pair:true, ph:'例：疲れているときに一言かけてほしい',
+       sugg:[['words:a','「ありがとう」を言葉で'],['words:b','「好き」と言われる'],['time:a','予定を合わせて会う'],['time:b','スマホを置いて話を聞く'],['gifts:a','ちょっとしたお土産'],['gifts:b','記念日のプレゼント'],['service:a','疲れた日に家事をしてくれる'],['service:b','デートを計画してくれる'],['touch:a','手をつなぐ'],['touch:b','ハグ']]},
+      {f:'express', l:'好きな人に、どうやって気持ちを伝えたい？', pair:true, ph:'例：言葉は照れるので行動で示したい',
+       sugg:[['words:a','言葉で伝える'],['words:b','手紙・LINEで伝える'],['time:a','会う時間をつくる'],['time:b','じっくり話を聞く'],['gifts:a','プレゼントを選ぶ'],['gifts:b','お土産を買ってくる'],['service:a','段取り・予約をする'],['service:b','手伝う・代わりにやる'],['touch:a','手をつなぐ・ハグ'],['touch:b','隣に座る']]},
+      {f:'lonely', l:'逆に、どんな行動をされると寂しい？', pair:true, ph:'例：既読のまま半日返事がないと不安',
+       sugg:[['l1','返信がずっとない'],['l2','話を聞いてもらえない'],['l3','予定のドタキャン'],['l4','記念日を忘れられる'],['l5','頼んだことを忘れられる'],['l6','感謝やほめ言葉がない'],['l7','触れるのを避けられる']]}]},
+    {id:'gap', type:'lovegap', title:'すれ違いのヒント',
+     hint:'ミニ診断・公式診断・「嬉しいこと」「伝え方」で選んだものから、自動で出しています。当てはまらなければ気にしなくてOK。'}
+   ]},
+  {id:'fun', g:1, label:'暮らしの楽しみ', title:'暮らしの楽しみ',
+   lead:'休日・旅行・お金をかけたいこと。楽しいことの優先順位がわかると、あとのお金のルールが決めやすくなります。',
+   cards:[
+    {id:'holiday', type:'form', title:'休日の過ごし方', fields:[
+      {f:'style', l:'好きな過ごし方（いくつでも）', tags:[['home','家でゆっくり'],['out','街に出かける'],['nature','自然・アウトドア'],['friends','友だちと会う'],['family','実家に行く'],['hobby','趣味に没頭'],['sports','体を動かす'],['food','おいしいものを食べに']]},
+      {f:'together', l:'二人で出かける頻度', opts:[['w1','毎週'],['w2','2週に1回'],['m1','月1〜2回'],['mood','気分で']]},
+      {f:'alone', l:'別々に過ごす時間', opts:[['often','けっこうほしい'],['some','たまにほしい'],['rare','ほぼ一緒がいい']]},
+      {f:'memo', l:'理想の休日', pair:true, ph:'例：土曜は出かけて、日曜は家で作り置き'}]},
+    {id:'travel', type:'form', title:'旅行', fields:[
+      {f:'freq', l:'行きたい頻度', opts:[['y1','年1回'],['y2','年2〜3回'],['season','季節ごと'],['can','行けるときに']]},
+      {f:'kind', l:'好きな旅（いくつでも）', tags:[['onsen','温泉'],['abroad','海外'],['domestic','国内の街歩き'],['theme','テーマパーク'],['outdoor','アウトドア'],['resort','リゾートでのんびり'],['gourmet','食べ歩き'],['family','家族旅行']]},
+      {f:'budget', l:'1回の旅行の予算感（二人で）', num:'万円くらい'},
+      {f:'where', l:'いつか行きたい場所', pair:true, ph:'例：北海道を車で回りたい'}]},
+    {id:'money', type:'form', title:'お金をかけたいところ',
+     hint:'それぞれ選びます。二人とも選んだものは、共通の予算を厚めにする候補。片方だけのものは、その人の自由費から、が基本の考え方です。',
+     fields:[
+      {f:'spend', l:'お金をかけたいもの（いくつでも）', tags:[['travel','旅行'],['food','食事・外食'],['hobby','趣味'],['home','家・インテリア'],['save','貯金・投資'],['kids','子ども・教育'],['car','車'],['fashion','服・美容'],['self','自己投資・学び'],['parents','親孝行'],['gift','記念日・プレゼント'],['health','健康・ジム']]},
+      {f:'cut', l:'あまりかけなくていいもの（いくつでも）', tags:[['car','車'],['fashion','服・美容'],['eatout','外食'],['brand','ブランド品'],['interior','インテリア'],['gadget','家電・ガジェット'],['sub','サブスク'],['event','イベント・飲み会']]},
+      {f:'dream', l:'いつか叶えたい大きな買い物・夢', pair:true, sugg:[['s0','家を買う'],['s1','ペットを飼う'],['s2','海外旅行'],['s3','車を買う'],['s4','子どもの教育'],['s5','独立・起業'],['s6','地方や海の近くに住む'],['s7','早めにのんびり暮らす'],['s8','趣味の部屋をつくる'],['s9','親を旅行に連れていく']], ph:'例：40歳までに家を買う。犬を飼う'}]}
+   ]},
+  {id:'policy', g:1, label:'二人の方針', title:'二人の方針',
+   lead:'細かい金額の前に、どんな考え方で決めるかをそろえます。ここで選んだことが、下の段のルールの土台になります。',
+   cards:[
+    {id:'values', type:'form', title:'大事にしたいこと', fields:[
+      {f:'fair', l:'公平さの考え方', opts:[['same','きっちり同じ額'],['fit','収入に合わせて無理なく'],['talk','その都度話して決める']]},
+      {f:'spend', l:'お金の使い方', opts:[['now','今を楽しむ寄り'],['mid','バランス'],['future','将来の備え寄り']]},
+      {f:'free', l:'お互いのお金の自由', opts:[['free','個人のお金は完全に自由'],['big','大きい額だけ共有'],['open','だいたい全部オープン']]},
+      {f:'memo', l:'補足', text:true, ph:'例：お金のことで我慢しすぎないように、気になったらすぐ言う'}]},
+    {id:'howdecide', type:'form', title:'意見が分かれたときの決め方', fields:[
+      {f:'split', l:'その場で決まらないときは', opts:[['hold','期日を決めて保留'],['owner','その分野の担当に任せる'],['mid','間を取る']]},
+      {f:'big', l:'二人で決める買い物・契約の目安', num:'万円以上'},
+      {f:'freq', l:'お金と暮らしの話をする頻度', opts:[['m1','月1回'],['m3','3か月に1回'],['need','必要なときだけ']]}]},
+    {id:'owners', type:'grid', title:'分野ごとに、主に動く人',
+     hint:'「主に」は、ひとりで決めるという意味ではありません。段取りをして、最初の案を出す人です。',
+     rows:[['money','お金の管理・支払い'],['chores','家事の段取り'],['home','新居・契約の手続き'],['wed','結婚式・前撮りの準備'],['famMe','{me}の親族との窓口'],['famYou','{you}の親族との窓口']],
+     opts:WHO3}
+   ]},
+
+  /* ---------- 第2段：ルール ---------- */
+  {id:'mrule', g:2, label:'お金のルール', title:'お金のルール',
+   lead:'金額はまだ書きません。分け方と、お金の通り道を決めます。',
+   cards:[
+    {id:'wallet', type:'form', title:'財布の形',
+     hint:'別々＝各自の口座から担当分を払う。共通口座＝毎月決まった額を入れて、共通の支払いはそこから。ひとつ＝収入をまとめて、各自のおこづかいを決める。',
+     fields:[{f:'type', l:'', opts:[['sep','完全に別々'],['joint','共通口座に毎月入れる'],['one','ほぼ全部ひとつ']]}]},
+    {id:'base', type:'form', title:'基本の分け方',
+     hint:'下の担当表で「基本どおり」にした費目は、ここで決めた分け方になります。',
+     fields:[
+      {f:'how', l:'', opts:[['half','折半'],['ratio','収入の比率'],['fixed','決まった額ずつ']]},
+      {f:'pct', l:'比率にする場合の、{me}の割合', num:'%', fhint:'空のままなら、「毎月のお金」に書いた手取りから自動で計算します。'},
+      {f:'ratioHint', calc:'ratio'}]},
+    {id:'items', type:'grid', title:'費目ごとの担当表',
+     hint:'「ここは折半、ここは{me}」を一覧で決めます。各自＝それぞれ自分の分を自分で払う。',
+     rows:RULE_ITEMS, opts:RULE_OPTS},
+    {id:'account', type:'form', title:'口座とカード', fields:[
+      {f:'joint', l:'共通の口座', opts:[['yes','作る'],['no','作らない'],['later','あとで']]},
+      {f:'holder', l:'共通口座の名義', opts:[['me','{me}'],['you','{you}']]},
+      {f:'card', l:'共通の支払いに使うカード', opts:[['joint','共通口座から引き落とすカード'],['each','各自のカードで払って精算'],['family','家族カード']]},
+      {f:'when', l:'入金・精算のタイミング', text:true, multi:[['s0','給料日に共通口座へ入金'],['s1','毎月決まった日に入金'],['s2','立て替えは月末に精算'],['s3','アプリに記録して精算'],['s4','大きな支払いはその都度精算']], ph:'例：毎月25日に各自が共通口座へ入金。立て替えは月末に精算'}]},
+    {id:'freedom', type:'form', title:'個人のお金', fields:[
+      {f:'free', l:'相談なしで使っていい額（1回あたり）', num:'万円まで'},
+      {f:'show', l:'個人の貯金を見せる範囲', opts:[['no','見せない'],['sum','合計だけ'],['all','全部']]},
+      {f:'debt', l:'借入・返済・仕送りがある場合', text:true, multi:[['s0','特にない'],['s1','残高と月額は共有する'],['s2','完済まで各自で払う'],['s3','共通費とは分けておく']], ph:'例：残高と月額だけは共有する'}]},
+    {id:'review', type:'form', title:'見直しのルール', fields:[
+      {f:'when', l:'定期的な見直し', opts:[['6m','半年ごと'],['1y','1年ごと'],['none','決めない']]},
+      {f:'trigger', l:'臨時に見直すきっかけ', text:true, multi:[['s0','手取りが変わった'],['s1','転職・異動'],['s2','育休・時短'],['s3','引越し'],['s4','子どもが生まれた'],['s5','片方の余裕がなくなった'],['s6','予算オーバーが続いた']], ph:'例：手取りが変わった／育休・転職／片方の余裕がなくなった'}]}
+   ]},
+  {id:'lrule', g:2, label:'暮らし・家事のルール', title:'暮らし・家事のルール',
+   lead:'お金と家事は単純に交換しません。仕事・通勤・家事を合わせた負担で考えます。',
+   cards:[
+    {id:'principle', type:'form', title:'家事の分け方の原則',
+     hint:'在宅だから家事ができる、多く払う人は家事が少ない、とは決めつけません。家事ごとの細かい割合は、第3段の「家事の分担」で決めます。',
+     fields:[
+      {f:'how', l:'', opts:[['skill','得意な方がやる'],['turn','交代でやる'],['time','時間がある方がやる'],['tool','家電・外注もどんどん使う']]},
+      {f:'aim', l:'全体の割合の目安', opts:[['55','だいたい半々'],['fit','働き方に合わせて傾ける'],['free','割合は気にしない']]},
+      {f:'memo', l:'補足', text:true, ph:'例：料理は得意な方、掃除は交代。食洗機と乾燥機は買う'}]},
+    {id:'trouble', type:'form', title:'困った日のルール', fields:[
+      {f:'cook', l:'自炊できない日は', text:true, multi:[['s0','惣菜・冷凍食品でOK'],['s1','外食・デリバリー'],['s2','作れる方が作る'],['s3','各自で済ませる'],['s4','作り置きを食べる']], ph:'例：惣菜や外食でOK。夕方までに一言連絡する'},
+      {f:'sick', l:'忙しい日・体調が悪い日は', text:true, multi:[['s0','元気な方が全部やる'],['s1','最低限だけやる'],['s2','家事は翌日に回す'],['s3','デリバリーや家事代行に頼る'],['s4','「今日むり」の合図を決める']], ph:'例：元気な方が全部やる。「今日むり」の合図を決めておく'},
+      {f:'talk', l:'不満の伝え方と、話し直すタイミング', text:true, multi:[['s0','その日のうちに伝える'],['s1','落ち着いてから話す'],['s2','週末にまとめて話す'],['s3','LINEや手紙で伝える'],['s4','「いま話せる？」と聞いてから'],['s5','寝る前には仲直り']], ph:'例：その日のうちに一言だけ伝える。じっくりは週末に'}]},
+    {id:'pace', type:'form', title:'生活のペース',
+     hint:'苦手なことや譲れないことを、お互い同じくらいの細かさで出します。',
+     fields:[
+      {f:'work', l:'仕事の場所と時間（在宅・出社・会議の音）', pair:true, sugg:[['s0','在宅が多い'],['s1','出社が多い'],['s2','在宅と出社が半々'],['s3','夜や休日も仕事あり'],['s4','オンライン会議が多い'],['s5','電話の声が出る']], ph:'例：週3在宅、会議は午前が多い'},
+      {f:'sleep', l:'睡眠・音・室温・清潔さ', pair:true, sugg:[['s0','早寝早起き'],['s1','夜型'],['s2','寝室は暗く静かに'],['s3','暑がり'],['s4','寒がり'],['s5','きれい好き'],['s6','ほどほどでOK'],['s7','物は少なめがいい']], ph:'例：0時に寝たい。エアコンは26度'},
+      {f:'alone', l:'ひとりの時間・来客', pair:true, sugg:[['s0','ひとりの時間は大事'],['s1','なるべく一緒がいい'],['s2','友だちを家に呼びたい'],['s3','来客は少なめがいい'],['s4','趣味の時間がほしい']], ph:'例：週に1回はひとりで出かけたい'}]}
+   ]},
+  {id:'family', g:2, label:'家族・親族', title:'家族・親族',
+   lead:'それぞれの家族との付き合い方を、先に大まかにそろえておきます。',
+   cards:[
+    {id:'visit', type:'form', title:'帰省・訪問', fields:[
+      {f:'freq', l:'帰省の考え方', opts:[['season','年末年始とお盆'],['each','それぞれ年1〜2回'],['talk','その都度相談']]},
+      {f:'stay', l:'泊まり・合鍵', text:true, multi:[['s0','泊まりOK'],['s1','泊まりは年に数回'],['s2','日帰りが基本'],['s3','合鍵は渡す'],['s4','合鍵は渡さない'],['s5','来る前に連絡をもらう']], ph:'例：泊まりは年2回まで。合鍵は渡さない'}]},
+    {id:'support', type:'form', title:'親からの援助',
+     hint:'援助は、贈与か貸し借りか、誰に・何のためかを確認します。決まるまで予算には入れません。',
+     fields:[{f:'how', l:'', opts:[['talk','受ける前に二人で相談'],['no','基本は受けない'],['ok','ありがたく受ける']]}]},
+    {id:'contact', type:'form', title:'窓口とお金の話', fields:[
+      {f:'who', l:'親族との連絡', opts:[['own','それぞれ自分の親'],['both','二人で']]},
+      {f:'share', l:'親族にお金の話をどこまで伝えるか', pair:true, sugg:[['s0','式の費用くらい'],['s1','住まいのこと'],['s2','収入は伝えない'],['s3','ほとんど伝えない'],['s4','援助の話は二人で決めてから']], ph:'例：式の費用くらいは伝えてOK'}]},
+    {id:'care', type:'form', title:'将来の介護', fields:[{f:'care', l:'いまの考え', pair:true, sugg:[['s0','近くに住みたい'],['s1','同居も考える'],['s2','施設やサービスも使う'],['s3','きょうだいと分担'],['s4','まだわからない']], ph:'例：近くに住むことは考えたい'}]}
+   ]},
+  {id:'future', g:2, label:'将来', title:'将来',
+   lead:'いまの希望でかまいません。約束として固定はしません。大事なことは早めに話してOKです。',
+   cards:[
+    {id:'kids', type:'form', title:'子ども・働き方', fields:[
+      {f:'kids', l:'子どもを望むか・時期の希望', pair:true, sugg:[['s0','ほしい'],['s1','ひとり'],['s2','ふたり以上'],['s3','早めがいい'],['s4','数年後がいい'],['s5','授かりもの'],['s6','まだ考え中'],['s7','子どもなしも選択肢']], ph:'例：2年以内にひとり。まだ迷っている、でもOK'},
+      {f:'job', l:'働き方（続ける・変える・休む）', pair:true, sugg:[['s0','今の仕事を続けたい'],['s1','転職したい'],['s2','在宅を増やしたい'],['s3','時短も考える'],['s4','独立したい'],['s5','育休を取りたい'],['s6','いずれ地方で働きたい']], ph:'例：続けたい。在宅中心にしたい'}]},
+    {id:'move', type:'form', title:'住まい', fields:[
+      {f:'plan', l:'', opts:[['stay','しばらく今の家'],['few','数年で住み替えを考える'],['tbd','未定']]},
+      {f:'memo', l:'補足', text:true, ph:'例：子どもができたら3LDKへ'}]},
+    {id:'change', type:'change', title:'収入や暮らしが変わったら？',
+     hint:'育休・時短・転職・繁忙期・介護など。何を守るかを先に決めておきます。'},
+    {id:'gate', type:'checks', title:'大きな契約の前に、二人で確認',
+     items:[['g1','二人とも負担に納得している'],['g2','契約の名義・同居の条件を確認した'],['g3','支払日と、その時の手元の残高を確認した'],['g4','総額・追加費用・取消の条件を確認した'],['g5','前払いや積立を二重に数えていない'],['g6','大きな気がかりが残っていない']]}
+   ]},
+
+  /* ---------- 第3段：数字と細部 ---------- */
+  {id:'money', g:3, label:'毎月のお金', title:'毎月のお金',
+   lead:'ここは数字を入れるだけ。費目の月額を書くと、担当表のルールでそれぞれの負担が自動で出ます。',
+   cards:[
+    {id:'monthly', type:'monthly', title:'毎月の支出と、それぞれの負担',
+     hint:'月額は二人分の合計で書きます。分け方を変えたいときは「お金のルール」の担当表へ。'},
+    {id:'cap', type:'cap', title:'払ったあと、余裕は残る？',
+     hint:'手取りは給与明細で確認（賞与は別）。天引き済みのものは B〜D で二重に引かない。'}
+   ]},
+  {id:'start', g:3, label:'最初にかかるお金', title:'最初にかかるお金',
+   lead:'新居・引越し・結婚準備の総額を出し、担当表のルールでそれぞれの負担に分けて、手元の現金で足りるかを確かめます。',
+   cards:[
+    {id:'home', type:'single', title:'新居まわりの見積',
+     hint:'見積が来たら同じ項目で書き込みます。敷金は返ってくる可能性があるので、預け金として分けて見ます。',
+     rows:[['keiyaku','賃貸の契約費用','礼金・仲介・保証・保険・鍵'],['shiki','敷金などの預け金','全額戻るとは限らない'],['mae','前家賃・日割り','何月分かをメモに'],
+           ['movMe','引越し（{me}）'],['movYou','引越し（{you}）'],['old','旧居の退去・重複家賃・処分'],['furn','家具・家電','「家具・家電」の「買う」の合計が自動で入ります','calc'],['infra','ネット工事・初日の生活用品']],
+     subtotal:'まず必要な現金', reserve:true},
+    {id:'wed', type:'single', title:'結婚準備のお金',
+     hint:'ご祝儀や援助は、決まるまで予算に入れません。成婚料はそれぞれの相談所へ各自で払うので、ここには入れません。',
+     rows:[['kao','両家顔合わせ'],['ring','結婚指輪'],['photo','前撮り（和装＋洋装）'],['wedding','挙式・会食（ディズニーで少人数）'],['trip','新婚旅行（希望があれば）']],
+     subtotal:'結婚準備の合計'},
+    {id:'cash', type:'cash', title:'それぞれの負担と、出せる現金',
+     hint:'出せる現金＝個人の預貯金から、生活防衛資金と別の支払い用に取っておくお金を引いた額。会社のお金や未確定の援助は入れません。'},
+    {id:'pay', type:'pay', title:'大きな支払いの予定',
+     hint:'総額が予算内でも、先に払う月に足りなくならないかを見ます。'}
+   ]},
+  {id:'furn', g:3, label:'家具・家電', title:'家具・家電',
+   lead:'まず持っている物から。買うのは、内見で採寸して、搬入の条件と納期を確かめてからにします。',
+   cards:[
+    {id:'items', type:'furniture', title:'持ち寄る？買う？後回し？',
+     hint:'「買う」にした物の予算（送料・組立込み）は、「最初にかかるお金」に自動で反映されます。',
+     items:[['fridge','冷蔵庫','容量・扉の向き・搬入寸法'],['wash','洗濯機','防水パン・蛇口・排水'],['bed','ベッド・寝具','幅・寝心地・別寝の選択'],['curtain','カーテン・照明','窓の寸法・初日に要る分'],
+            ['ac','エアコン・コンロ','備え付けかどうか'],['kitchen','調理家電・掃除機','レンジ・炊飯器など'],['dish','食器・調理道具',''],['dining','ダイニング','食事と作業の兼用'],
+            ['sofa','ソファ・テレビ','配置・視聴距離'],['storage','収納','造り付け収納の量'],['desk','仕事机・椅子','個人・共用・会社の物を区別']]},
+    {id:'want', type:'form', title:'お金をかけたい物は？',
+     hint:'各自2つまで。共通の基準を超える分は、差額の負担も相談します。持ち寄る家具は、本人の同意なく処分しません。',
+     fields:[{f:'want', l:'こだわりたい物', pair:true, sugg:[['s0','ベッド・寝具'],['s1','ソファ'],['s2','ダイニング'],['s3','照明'],['s4','カーテン'],['s5','冷蔵庫'],['s6','洗濯乾燥機'],['s7','食洗機'],['s8','ロボット掃除機'],['s9','仕事机・椅子']], ph:'例：ベッドとソファ'}]},
+    {id:'measure', type:'checks', title:'注文する前に確認すること',
+     items:[['m1','持っている家具の写真と寸法を共有した'],['m2','部屋・玄関・階段・エレベーターを採寸した'],['m3','送料・組立・旧品回収・返品条件を確認した'],['m4','受け取る人と日時を決めた']]}
+   ]},
+
+  {id:'hw', g:3, label:'家事の分担', title:'家事の分担',
+   lead:'家事を細かく分けて、それぞれ何%ずつ持つかを決めます。100対0でなくてかまいません。「気づく→段取り→やる→片づける」までを1つの家事と数えます。',
+   cards:[
+    {id:'sum', type:'hwsum', title:'全体のバランス',
+     hint:'週あたりの時間を入れた家事は、時間の長さで重みをつけます（入れていない家事は1時間として数えます）。'},
+    ...HW_CATS.map(c => ({id:c.id, type:'hwcat', title:c.name, hint:c.hint}))
+   ]},
+
+  /* ---------- 予定 ---------- */
+  {id:'flow', g:9, label:'これからの流れ', title:'これからの流れ',
+   lead:'12/19（プロポーズ目安）までのやることと、そのあとの大きな節目。やることは追加・変更できます。', cards:[
+    {id:'dates', type:'form', title:'プロポーズまでにしたいデート',
+     hint:'それぞれ行きたいものを選びます。選んだものは、上の一覧の「デート・二人の時間」に候補として出るので、タップでやることに入れられます。',
+     fields:[
+      {f:'idea', l:'行きたいデート（いくつでも）', tags:DATE_IDEAS},
+      {f:'memo', l:'行きたい場所・やってみたいこと', pair:true, ph:'例：イルミネーションを見てから、おいしいご飯を食べたい'}]}]},
+  {id:'propose', g:9, label:'プロポーズのこと', title:'プロポーズのこと',
+   lead:'12/19（土）ごろが目安。当日の中身はお楽しみにして、ここでは好みだけ聞かせてください。あてはまるものをタップ、なければ「その他」へ。',
+   cards:[
+    {id:'mood', type:'form', title:'雰囲気', fields:[
+      {f:'place', l:'{you}が好きな雰囲気（いくつでも）', text:true, ph:'例：人が少ないところがいい',
+       multi:[['s0','二人きりで静かに'],['s1','夜景'],['s2','景色のいい場所'],['s3','思い出の場所'],['s4','レストランで'],['s5','家でゆっくり'],['s6','旅行先で'],['s7','自然の中で']]},
+      {f:'surprise', l:'サプライズの度合い', noSplit:true, opts:[['full','完全なサプライズがいい'],['half','日にちだけ知っていたい'],['known','知っている方が安心'],['any','どれでもうれしい']]},
+      {f:'dress', l:'当日の服装', noSplit:true, opts:[['dress','少しおしゃれしたい'],['casual','いつも通りでいい'],['tell','服装の目安だけ教えてほしい']]}]},
+    {id:'gift', type:'form', title:'記念品',
+     hint:'婚約指輪は買わない前提です。代わりに何かあるとうれしいか、聞かせてください。',
+     fields:[
+      {f:'want', l:'記念品は', noSplit:true, opts:[['want','何かほしい'],['small','ささやかなものでいい'],['none','なくていい'],['later','あとで一緒に選びたい']]},
+      {f:'kind', l:'うれしいもの（いくつでも）', text:true, ph:'例：シルバー系で小ぶりなものが好き',
+       multi:[['s0','ネックレス'],['s1','腕時計'],['s2','ブレスレット'],['s3','花束'],['s4','ペアのもの'],['s5','手紙'],['s6','写真・アルバム'],['s7','実用的なもの']]}]},
+    {id:'moment', type:'form', title:'当日のこと', fields:[
+      {f:'want', l:'あるとうれしいこと（いくつでも）', text:true, ph:'例：短くても言葉で伝えてほしい',
+       multi:[['s0','手紙や言葉'],['s1','写真を残す'],['s2','花束'],['s3','おいしい食事'],['s4','二人だけの時間'],['s5','あとで家族や友だちにも祝ってほしい']]},
+      {f:'avoid', l:'避けてほしいこと（いくつでも）', text:true, ph:'例：泣いた顔は撮らないでほしい',
+       multi:[['s0','人前・大勢の前'],['s1','動画を撮られる'],['s2','寒い・暑い屋外'],['s3','長い移動'],['s4','高すぎるお店'],['s5','派手な演出']]},
+      {f:'tell', l:'決まったら最初に伝えたい人', noSplit:true, opts:[['parents','親'],['friends','友だち'],['both','親と友だち'],['later','落ち着いてから']]}]}
+   ]},
+  {id:'match', g:9, label:'答え合わせ', title:'ふたりの答え合わせ',
+   lead:'夫婦像・家庭・愛情の伝え方・暮らしの楽しみで、二人が選んだものを並べました。重なったところは二人の軸、分かれたところは次に話すタネです。', cards:[]},
+  {id:'summary', g:9, label:'まとめ', title:'決まったことのまとめ',
+   lead:'ここまでに書いたことを一覧にしています。「文章でコピー」で、LINE などにそのまま貼れます。', cards:[]}
+];
+
+
+
+/* ================= 状態 ================= */
+const DEF_NAMES = {me:'わたし', you:'お相手'};
+const S = {
+  settings:{...DEF_NAMES},
+  shared:{},              // topicId -> {cards:{cardId:{v:{},st:'',next:'',at:''}}}
+  self:{pin:'', pdate:'2026-12-19', checks:{}, gift:'', giftBudget:'', memo:'', places:[], plan:[], bPlace:'', bFlower:'', bOther:''},
+  topic:'couple', mode:'shared',
+  open:{}, split:{}, memo:{}, sumFilter:'all', adding:null, editTask:null, editIn:'gantt', loEdit:{}, keep:{}   // 画面だけの状態（保存しない）
+};
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ME = () => S.settings.me || DEF_NAMES.me;
+const YOU = () => S.settings.you || DEF_NAMES.you;
+const fmt = s => String(s).replace(/\{me\}/g, ME()).replace(/\{you\}/g, YOU());
+const lsGet = k => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } };
+const lsSet = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
+const topicOf = id => TOPICS.find(t => t.id === id);
+if(SOLO) Object.assign(topicOf('summary'), {label:'送る', title:'送る・受け取る', lead:'書けたら、ここから送ります。'});
+const cardDef = (t,c) => topicOf(t).cards.find(x => x.id === c);
+
+function card(t,c){
+  const T = S.shared[t] || (S.shared[t] = {cards:{}});
+  return T.cards[c] || (T.cards[c] = {v:{}, st:'', next:'', at:''});
+}
+const getV = (t,c,f) => card(t,c).v[f];
+function num(x){ if(x===undefined||x===null||x==='') return null; const n=parseFloat(String(x).replace(/,/g,'').replace(/[^\d.\-]/g,'')); return Number.isFinite(n)?n:null; }
+function sum(arr){ let any=false, s=0; for(const x of arr){ if(x!==null && x!==undefined){ any=true; s+=x; } } return any ? s : null; }
+const N = (t,c,f) => num(getV(t,c,f));
+function fmtN(n){ if(n===null||n===undefined) return '—'; return (Math.round(n*10)/10).toLocaleString('ja-JP',{maximumFractionDigits:1}); }
+
+/* ================= ルール → 負担の計算 ================= */
+function pctMe(){
+  const p = N('mrule','base','pct');
+  if(p!==null) return Math.min(100, Math.max(0, p));
+  const am=N('money','cap','A.me'), ay=N('money','cap','A.you');
+  return (am && ay) ? am/(am+ay)*100 : null;
+}
+// 'half' | 'ratio' | 'me' | 'you' | 'each' | 'manual'
+function effRule(key){
+  const r = getV('mrule','items',key);
+  if(r && r!=='base') return r;
+  const b = getV('mrule','base','how');
+  return b==='half' ? 'half' : b==='ratio' ? 'ratio' : 'manual';
+}
+function ruleText(key){
+  const m = effRule(key), viaBase = !getV('mrule','items',key) || getV('mrule','items',key)==='base';
+  let s;
+  if(m==='half') s='折半';
+  else if(m==='ratio'){ const p=pctMe(); s = p===null ? '比率（手取り待ち）' : `比率 ${Math.round(p)}：${100-Math.round(p)}`; }
+  else if(m==='me') s=`${ME()}が払う`;
+  else if(m==='you') s=`${YOU()}が払う`;
+  else if(m==='each') s='各自';
+  else s = getV('mrule','base','how')==='fixed' ? '決まった額（手入力）' : '未決定（手入力）';
+  return {text:s, base:viaBase, open:m==='manual'};
+}
+function split(key, total){
+  const m = effRule(key);
+  if(total===null) return {me:null, you:null, m};
+  if(m==='half') return {me:total/2, you:total/2, m};
+  if(m==='ratio'){ const p=pctMe(); return p===null ? {me:null,you:null,m} : {me:total*p/100, you:total*(100-p)/100, m}; }
+  if(m==='me') return {me:total, you:0, m};
+  if(m==='you') return {me:0, you:total, m};
+  return {me:null, you:null, m};
+}
+
+function compute(){
+  const R = {};
+  // 毎月
+  const shares = {};
+  for(const k of MONTHLY){
+    const tot = N('money','monthly',k), m = effRule(k);
+    let s;
+    if(m==='manual') s = {me:N('money','monthly',k+'.me'), you:N('money','monthly',k+'.you'), m};
+    else s = split(k, tot);
+    shares[k]=s;
+    R['m.'+k+'.me']=s.me; R['m.'+k+'.you']=s.you;
+  }
+  const inF = k => shares[k].m!=='each';
+  R['F.me'] = sum(MONTHLY.filter(inF).map(k=>shares[k].me));
+  R['F.you'] = sum(MONTHLY.filter(inF).map(k=>shares[k].you));
+  R['M.all'] = sum(MONTHLY.map(k=>N('money','monthly',k)));
+  for(const who of ['me','you']){
+    const A=N('money','cap','A.'+who), B=N('money','cap','B.'+who), C=N('money','cap','C.'+who), D=N('money','cap','D.'+who);
+    R['E.'+who] = A===null ? null : A-(B||0)-(C||0)-(D||0);
+    R['G.'+who] = (R['E.'+who]===null||R['F.'+who]===null) ? null : R['E.'+who]-R['F.'+who];
+  }
+  // 最初にかかるお金
+  const items = cardDef('furn','items').items;
+  R.furn = sum(items.filter(i=>getV('furn','items',i[0]+'.how')==='buy').map(i=>N('furn','items',i[0]+'.budget')));
+  const home = cardDef('start','home');
+  const homeBase = sum(home.rows.filter(r=>r[3]!=='calc').map(r=>N('start','home',r[0])));
+  const reserve = N('start','home','reserve');
+  R['home.sub'] = sum([homeBase, R.furn]);
+  R['home.cap'] = (R['home.sub']===null && reserve===null) ? null : (R['home.sub']||0)+(reserve||0);
+  const wed = cardDef('start','wed');
+  const wedBase = sum(wed.rows.filter(r=>r[0]!=='trip').map(r=>N('start','wed',r[0])));
+  const tripTot = N('start','wed','trip');
+  R['wed.sub'] = sum([wedBase, tripTot]);
+  const parts = [['start', sum([homeBase, reserve])], ['furn', R.furn], ['wed', wedBase], ['trip', tripTot]];
+  let incomplete = false;
+  const need = {me:[], you:[]};
+  for(const [k,tot] of parts){
+    if(tot===null) continue;
+    const s = split(k, tot);
+    if(s.me===null){ incomplete = true; continue; }
+    need.me.push(s.me); need.you.push(s.you);
+  }
+  R.needIncomplete = incomplete;
+  R['need.me'] = incomplete ? null : sum(need.me);
+  R['need.you'] = incomplete ? null : sum(need.you);
+  for(const who of ['me','you']){
+    const c = N('start','cash','cash.'+who);
+    R['cash.diff.'+who] = (c===null||R['need.'+who]===null) ? null : c-R['need.'+who];
+  }
+  // 家事：時間で重みづけした{me}の割合
+  let tw=0, tme=0, hme=0, hyou=0, anyH=false;
+  for(const cat of HW_CATS){
+    const C = card('hw', cat.id);
+    const list = cat.tasks.map(t=>({key:t[0], pct:num(C.v[t[0]+'.pct']), h:num(C.v[t[0]+'.h'])}))
+      .concat((C.v.rows||[]).map((r,i)=>({key:'rows.'+i, pct:num(r.pct), h:num(r.h)})));
+    let cw=0, cme=0;
+    for(const x of list){
+      if(x.pct===null) continue;
+      R[`hw.${cat.id}.${x.key}.me`] = x.pct; R[`hw.${cat.id}.${x.key}.you`] = 100-x.pct;
+      const w = x.h>0 ? x.h : 1;
+      cw += w; cme += w*x.pct;
+      if(x.h>0){ anyH=true; hme += x.h*x.pct/100; hyou += x.h*(100-x.pct)/100; }
+    }
+    R['hwc.'+cat.id] = cw ? cme/cw : null;
+    tw += cw; tme += cme;
+  }
+  R['hw.all'] = tw ? tme/tw : null;
+  R['hw.hours'] = anyH ? `週あたり ${ME()} ${fmtN(hme)}時間 ／ ${YOU()} ${fmtN(hyou)}時間（時間を入れた家事のみ）` : '週あたりの時間を入れると、時間の合計も出ます';
+  R['money.pct'] = (R['F.me']!==null && R['F.you']!==null && R['F.me']+R['F.you']>0) ? R['F.me']/(R['F.me']+R['F.you'])*100 : null;
+  return R;
+}
+function paintCalc(){
+  const R = compute();
+  document.querySelectorAll('[data-calc]').forEach(el=>{
+    const k = el.dataset.calc;
+    if(k==='ratio'){ const p=pctMe(); el.textContent = p===null ? '「毎月のお金」で二人の手取りを書くと出ます' : `${ME()} ${Math.round(p)}% ／ ${YOU()} ${100-Math.round(p)}%`; return; }
+    if(k==='needNote'){ el.hidden = !R.needIncomplete; return; }
+    const v = R[k] ?? null;
+    if(typeof v==='string'){ el.textContent = v; return; }
+    if(el.dataset.fmt==='pct'){ el.textContent = v===null ? '—' : Math.round(v)+'%'; return; }
+    if(el.dataset.fmt==='pair'){ el.textContent = v===null ? 'まだ入っていません' : `${ME()} ${Math.round(v)}% ／ ${YOU()} ${100-Math.round(v)}%`; return; }
+    el.textContent = fmtN(v);
+    el.classList.toggle('neg', v!==null && v<0);
+    el.classList.toggle('empty', v===null);
+  });
+  document.querySelectorAll('[data-bar]').forEach(el=>{
+    const v = R[el.dataset.bar] ?? null;
+    el.style.width = (v===null ? 0 : v)+'%';
+    el.parentElement.classList.toggle('empty', v===null);
+  });
+}
+
+/* ================= 描画：部品 ================= */
+function kv(k){ const [t,c,f]=k.split('|'); const C=card(t,c); if(f==='@next') return C.next; if(f==='@st') return C.st;
+  if(f.startsWith('rows.')){ const [,i,x]=f.split('.'); return (C.v.rows||[])[+i]?.[x] ?? ''; } return C.v[f] ?? ''; }
+const numIn = (k, unit='万円', label='') => `<div class="unit"><input class="num" inputmode="decimal" data-k="${k}" value="${esc(kv(k))}" aria-label="${esc(label||unit)}"><span>${esc(unit)}</span></div>`;
+const out = k => `<output class="v" data-calc="${k}">—</output>`;
+function seg(k, opts, cls=''){
+  const cur = kv(k);
+  return `<div class="seg ${cls}" role="group">${opts.map(([v,l])=>`<button type="button" class="seg-b" data-pick="${k}" data-val="${v}" aria-pressed="${cur===v}">${esc(fmt(l))}</button>`).join('')}</div>`;
+}
+const area = (k, ph='', label='') => `<textarea class="area" rows="2" data-k="${k}" placeholder="${esc(ph)}" aria-label="${esc(label)}">${esc(kv(k))}</textarea>`;
+const txt = (k, ph='') => `<input class="txt" data-k="${k}" value="${esc(kv(k))}" placeholder="${esc(ph)}">`;
+
+// 案のチップ。base.me / base.you（二人で選ぶ案は base）に選択を配列で持つ。
+// 「＋ その他」で足した案は base.x に文字列で持ち、値は 'x:' + 文字列
+const allTags = (K, base, tags) => tags.concat((kv(K(base+'.x')) || []).map(l => ['x:'+l, l, true]));
+function tagState(K, base, tags){
+  const all = allTags(K, base, tags), a = kv(K(base+'.me')) || [], b = kv(K(base+'.you')) || [];
+  const lab = arr => all.filter(([v]) => arr.includes(v)).map(([,l]) => l);
+  return {me:lab(a), you:lab(b), both:all.filter(([v]) => a.includes(v) && b.includes(v)).map(([,l]) => l)};
+}
+const tagBoth = (K, fd) => tagState(K, fd.f, fd.tags).both;
+function chipBtns(key, all, ck, sels){
+  const cur = kv(key) || [];
+  const chips = all.map(([v,l,custom]) => {
+    const btn = `<button type="button" class="seg-b${custom?' custom':''}" data-tag="${key}" data-val="${esc(v)}" aria-pressed="${cur.includes(v)}">${esc(l)}</button>`;
+    return custom ? `<span class="chip-x">${btn}<button type="button" class="x" data-act="tagdel" data-ck="${ck}" data-label="${esc(l)}" data-sels="${sels}" aria-label="「${esc(l)}」を消す">×</button></span>` : btn;
+  }).join('');
+  const add = S.adding===key
+    ? `<span class="add-inline"><input class="txt" id="addin" data-row="${key}" data-ck="${ck}" maxlength="30" placeholder="自分の言葉で" aria-label="その他の案"><button type="button" class="btn pri" data-act="tagaddok">追加</button><button type="button" class="mini" data-act="tagaddcancel">やめる</button></span>`
+    : `<button type="button" class="seg-b add-chip" data-act="tagadd" data-row="${key}">＋ その他</button>`;
+  return `<div class="seg" role="group">${chips}${add}</div>`;
+}
+function tagRows(K, base, tags){
+  const all = allTags(K, base, tags), ck = K(base+'.x'), sels = [K(base+'.me'), K(base+'.you')].join(',');
+  if(SOLO) return `<div class="seg sm tagrows">${chipBtns(K(base+'.you'), all, ck, sels)}</div>`;
+  const both = tagState(K, base, tags).both;
+  return `<div class="seg sm tagrows">
+      <div class="opin"><span class="who">${esc(ME())}</span>${chipBtns(K(base+'.me'), all, ck, sels)}</div>
+      <div class="opin"><span class="who">${esc(YOU())}</span>${chipBtns(K(base+'.you'), all, ck, sels)}</div></div>
+    <div class="result"><span class="k">二人とも選んだもの</span><span>${both.length?esc(both.join('・')):'—'}</span></div>`;
+}
+const multiRow = (K, base, tags) => `<div class="seg sm">${chipBtns(K(base), allTags(K, base, tags), K(base+'.x'), K(base))}</div>`;
+const multiLabels = (K, base, tags) => { const sel = kv(K(base)) || []; return allTags(K, base, tags).filter(([v]) => sel.includes(v)).map(([,l]) => l); };
+
+// 1つ選ぶ質問の「その他」：値 'other' と、key + '.other' に中身
+const OTHER = ['other','その他'];
+function segOther(key, opts, cls=''){
+  return `${seg(key, [...opts, OTHER], cls)}${kv(key)==='other' ? `<input class="txt other-in" data-k="${key}.other" value="${esc(kv(key+'.other'))}" placeholder="その他の内容" aria-label="その他の内容">` : ''}`;
+}
+function optLabel(opts, val, otherText){
+  if(val==='other') return otherText ? `その他（${otherText}）` : 'その他';
+  const o = opts.find(x => x[0]===val); return o ? fmt(o[1]) : '';
+}
+function formField(K, fd){
+  const lab = fd.l ? `<span class="flabel">${esc(fmt(fd.l))}</span>` : '';
+  const hint = fd.fhint ? `<span class="fhint">${esc(fmt(fd.fhint))}</span>` : '';
+  if(SOLO && !K('').startsWith('propose|')){
+    // {you}版：{you}の欄だけ。二人で決める欄（結論・金額・補足）は出さない
+    if(fd.opts && !fd.noSplit) return `<div class="field">${lab}<div>${segOther(K(fd.f+'.you'), fd.opts)}</div>${hint}</div>`;
+    if(fd.tags) return `<div class="field">${lab}${tagRows(K, fd.f, fd.tags)}</div>`;
+    if(fd.pair) return `<div class="field">${lab}${fd.sugg?`${tagRows(K, fd.f+'.t', fd.sugg)}<span class="fhint">ほかにあれば・くわしく</span>`:''}${area(K(fd.f+'.you'), fd.ph||'', YOU())}</div>`;
+    return '';
+  }
+  if(fd.calc==='ratio') return `<div class="result"><span class="k">手取りの比率だと</span><output data-calc="ratio"></output></div>`;
+  if(fd.opts){
+    // 「二人の意見が違う」を開くと、それぞれの考え＋二人の結論の3段になる
+    if(fd.noSplit) return `<div class="field">${lab}<div>${segOther(K(fd.f), fd.opts)}</div>${hint}</div>`;
+    const key = K(fd.f), shown = S.split[key] ?? !!(kv(K(fd.f+'.me')) || kv(K(fd.f+'.you')));
+    const body = shown
+      ? `<div class="opin"><span class="who">${esc(ME())}の考え</span><div>${segOther(K(fd.f+'.me'), fd.opts, 'sm')}</div></div>
+         <div class="opin"><span class="who">${esc(YOU())}の考え</span><div>${segOther(K(fd.f+'.you'), fd.opts, 'sm')}</div></div>
+         <div class="opin concl"><span class="who">二人の結論</span><div>${segOther(key, fd.opts)}</div></div>`
+      : segOther(key, fd.opts);
+    return `<div class="field">${lab}${body}${hint}
+      <div><button type="button" class="mini" data-act="split" data-key="${key}" data-shown="${shown?1:0}">${shown?'それぞれの考えの欄を閉じる':'二人の意見が違う'}</button></div></div>`;
+  }
+  if(fd.tags) return `<div class="field">${lab}${tagRows(K, fd.f, fd.tags)}</div>`;
+  if(fd.num) return `<div class="field">${lab}<div style="max-width:240px">${numIn(K(fd.f), fd.num, fmt(fd.l))}</div>${hint}</div>`;
+  if(fd.pair){
+    // 案（それぞれ選ぶ）→ 足りない分を文章で
+    const sugg = fd.sugg ? `${tagRows(K, fd.f+'.t', fd.sugg)}<span class="fhint">ほかにあれば・くわしく</span>` : '';
+    return `<div class="field">${lab}${sugg}<div class="grid2">
+      <div class="field"><span class="who">${esc(ME())}</span>${area(K(fd.f+'.me'),fd.ph||'',ME())}</div>
+      <div class="field"><span class="who">${esc(YOU())}</span>${area(K(fd.f+'.you'),fd.ph||'',YOU())}</div></div></div>`;
+  }
+  if(fd.text){
+    // 案（二人で選ぶ）→ 補足を文章で
+    const multi = fd.multi ? `${multiRow(K, fd.f+'.t', fd.multi)}<span class="fhint">ほかにあれば・くわしく</span>` : '';
+    return `<div class="field">${lab}${multi}${area(K(fd.f), fd.ph||'', fmt(fd.l))}${hint}</div>`;
+  }
+  return '';
+}
+
+function renderCardBody(t, c){
+  const K = f => `${t}|${c.id}|${f}`;
+  switch(c.type){
+    case 'form': return c.fields.map(fd=>formField(K,fd)).join('');
+    case 'grid':
+      return `<div class="rows">${c.rows.map(r=> Array.isArray(r)
+        ? `<div class="row"><div class="name">${esc(fmt(r[1]))}${r[2]?`<small>${esc(r[2])}</small>`:''}</div><div class="ctl">${seg(K(r[0]), c.opts, 'sm')}</div></div>`
+        : `<div class="sect">${esc(r.sect)}</div>`).join('')}</div>`;
+    case 'monthly': {
+      const rows = MONTHLY.map(k=>{
+        const def = RULE_ROWS.find(r=>r[0]===k), rt = ruleText(k), m = effRule(k);
+        const cell = who => m==='manual' ? numIn(K(k+'.'+who), '万円', who==='me'?ME():YOU()) : m==='each' ? `<span class="each">各自</span>` : out(`m.${k}.${who}`);
+        return `<tr><td>${esc(def[1])}${def[2]?`<span class="sub">${esc(def[2])}</span>`:''}</td>
+          <td class="c">${numIn(K(k),'万円',def[1])}</td>
+          <td><span class="chip ${rt.open?'tmp':'acc'}">${esc(rt.text)}</span></td>
+          <td class="c">${cell('me')}</td><td class="c">${cell('you')}</td></tr>`;
+      }).join('');
+      return `<div class="tbl-wrap"><table class="t" style="min-width:640px"><thead><tr><th>費目</th><th>月額（二人分）</th><th class="l">分け方</th><th>${esc(ME())}</th><th>${esc(YOU())}</th></tr></thead><tbody>
+        ${rows}
+        <tr class="calc total"><td>毎月の負担の合計<span class="sub">各自の費目は除く</span></td><td>${out('M.all')}</td><td></td><td>${out('F.me')}</td><td>${out('F.you')}</td></tr>
+      </tbody></table></div>
+      <div class="callout">分け方が「未決定」の行は、二人の額を手で入れられます。担当表で決めると自動になります。 <button type="button" class="link" data-go="mrule">担当表を開く</button></div>`;
+    }
+    case 'cap': {
+      const rows=[['A','通常月の手取り','賞与は別'],['B','個人の必要な支出','返済・仕送りなど'],['C','自由に使いたいお金'],['D','個人の貯金・積立']];
+      return `<div class="tbl-wrap"><table class="t"><thead><tr><th>万円／月</th><th>${esc(ME())}</th><th>${esc(YOU())}</th></tr></thead><tbody>
+        ${rows.map(([f,l,s])=>`<tr><td>${f}　${l}${s?`<span class="sub">${s}</span>`:''}</td><td class="c">${numIn(K(f+'.me'),'万円',ME())}</td><td class="c">${numIn(K(f+'.you'),'万円',YOU())}</td></tr>`).join('')}
+        <tr class="calc"><td>E　共通費に回せる目安<span class="sub">A − B − C − D（自動）</span></td><td>${out('E.me')}</td><td>${out('E.you')}</td></tr>
+        <tr class="calc"><td>F　毎月の負担<span class="sub">上の表から（自動）</span></td><td>${out('F.me')}</td><td>${out('F.you')}</td></tr>
+        <tr class="calc total"><td>G　残る余裕<span class="sub">E − F。マイナスなら、ルールか金額を見直す</span></td><td>${out('G.me')}</td><td>${out('G.you')}</td></tr>
+      </tbody></table></div>`;
+    }
+    case 'single':
+      return `<div class="tbl-wrap"><table class="t" style="min-width:420px"><thead><tr><th>項目</th><th>見積・予算</th></tr></thead><tbody>
+        ${c.rows.map(([f,l,s,calc])=>`<tr><td>${esc(fmt(l))}${s?`<span class="sub">${esc(s)}</span>`:''}</td><td class="c" style="width:170px">${calc?out('furn'):numIn(K(f),'万円',fmt(l))}</td></tr>`).join('')}
+        <tr class="calc"><td>${c.subtotal}<span class="sub">自動</span></td><td>${out(c.id+'.sub')}</td></tr>
+        ${c.reserve?`<tr><td>予備枠<span class="sub">見積外への備え。払うまでは支出にしない</span></td><td class="c">${numIn(K('reserve'),'万円','予備枠')}</td></tr>
+        <tr class="calc total"><td>新居準備の上限<span class="sub">小計＋予備枠</span></td><td>${out('home.cap')}</td></tr>`:''}
+      </tbody></table></div>`;
+    case 'cash': {
+      const rt = k => esc(ruleText(k).text);
+      return `<div class="tbl-wrap"><table class="t"><thead><tr><th>万円</th><th>${esc(ME())}</th><th>${esc(YOU())}</th></tr></thead><tbody>
+        <tr class="calc"><td>負担する額<span class="sub">新居：${rt('start')}／家具：${rt('furn')}／結婚準備：${rt('wed')}／旅行：${rt('trip')}</span></td><td>${out('need.me')}</td><td>${out('need.you')}</td></tr>
+        <tr><td>出せる現金</td><td class="c">${numIn(K('cash.me'),'万円',ME())}</td><td class="c">${numIn(K('cash.you'),'万円',YOU())}</td></tr>
+        <tr class="calc total"><td>差<span class="sub">マイナスなら足りない</span></td><td>${out('cash.diff.me')}</td><td>${out('cash.diff.you')}</td></tr>
+      </tbody></table></div>
+      <div class="callout" data-calc="needNote" hidden>分け方が決まっていない費目があるため、負担額を出せません。 <button type="button" class="link" data-go="mrule">担当表を開く</button></div>
+      <div class="callout">足りないときは、家具を後回しにする・プランや家賃や時期を見直す、を先に考えます。生活防衛資金や借入で埋める前に、二人で組み直します。</div>`;
+    }
+    case 'pay': {
+      const rows = card(t,c.id).v.rows || [];
+      return `<div class="pay h"><span>項目</span><span>支払月</span><span>金額（万円）</span><span>立て替える人</span><span>最終的に負担</span><span></span></div>
+        ${rows.map((r,i)=>`<div class="pay">
+          ${txt(K(`rows.${i}.item`),'例：新居の契約金')}${txt(K(`rows.${i}.month`),'例：2月')}
+          <input class="num" inputmode="decimal" data-k="${K(`rows.${i}.amt`)}" value="${esc(r.amt??'')}" aria-label="金額">
+          ${txt(K(`rows.${i}.payer`),'')}${txt(K(`rows.${i}.bearer`),'例：担当表どおり')}
+          <button type="button" class="del" data-act="delrow" data-card="${t}|${c.id}" data-i="${i}" aria-label="この行を消す">✕</button></div>`).join('')}
+        <button type="button" class="add" data-act="addrow" data-card="${t}|${c.id}">＋ 支払いを追加</button>`;
+    }
+    case 'furniture':
+      return `<div class="rows">${c.items.map(([f,l,s])=>{
+          const how = kv(K(f+'.how'));
+          return `<div class="row ${how==='buy'?'':'off'}"><div class="name">${l}${s?`<small>${s}</small>`:''}</div><div class="ctl">
+            ${seg(K(f+'.how'),[['me','{me}が持参'],['you','{you}が持参'],['buy','買う'],['later','後回し']],'sm')}
+            ${numIn(K(f+'.budget'),'万円',l+'の予算')}
+            ${seg(K(f+'.when'),[['d1','入居初日'],['m1','1か月以内'],['later','あとで']],'sm')}
+          </div></div>`;}).join('')}</div>
+        <div class="result"><span class="k">「買う」の合計</span><output data-calc="furn">—</output><span class="k">万円</span><span class="k">分け方：${esc(ruleText('furn').text)}</span></div>`;
+    case 'chores':
+      return `<div class="rows">${c.items.map(([f,l,s])=>`<div class="row"><div class="name">${l}<small>${s}</small></div><div class="ctl">
+          ${seg(K(f+'.who'),[['me','{me}'],['you','{you}'],['turn','交代で'],['out','家電・外注で']],'sm')}
+          ${txt(K(f+'.std'),'代わりの人・完了の基準')}</div></div>`).join('')}</div>`;
+    case 'lovequiz': {
+      const q = LOVE_Q.map((x,i)=>`<div class="lq"><div class="lq-q">Q${i+1}. ${esc(x.q)}</div>
+          ${SOLO?'':`<div class="opin"><span class="who">${esc(ME())}</span>${seg(K(`q${i}.me`), [['a',x.a[1]],['b',x.b[1]]], 'sm')}</div>`}
+          <div class="opin"><span class="who">${esc(YOU())}</span>${seg(K(`q${i}.you`), [['a',x.a[1]],['b',x.b[1]]], 'sm')}</div></div>`).join('');
+      const sm = quizScore('me'), sy = quizScore('you');
+      const bar = (n, cls) => `<div class="llbar ${cls}"><i style="width:${n/4*100}%"></i></div><b>${n}</b>`;
+      if(SOLO) return `${q}<div class="ll-res"><div class="ll-row h"><span></span><span>${esc(YOU())}（${sy.n}/10問）</span><span></span></div>
+          ${LANGS.map(l=>`<div class="ll-row"><span>${l.n}</span>${bar(sy.c[l.id],'you')}</div>`).join('')}</div>`;
+      return `${q}
+        <div class="ll-res"><div class="ll-row h"><span></span><span>${esc(ME())}（${sm.n}/10問）</span><span></span><span>${esc(YOU())}（${sy.n}/10問）</span><span></span></div>
+          ${LANGS.map(l=>`<div class="ll-row"><span>${l.n}</span>${bar(sm.c[l.id],'')}${bar(sy.c[l.id],'you')}</div>`).join('')}</div>
+        <div class="callout">点数が高いほど、その表現で「大切にされている」と感じやすい傾向。どの表現も大切なので、1つに決めつけず「当たってると思う？」と話すのがおすすめです。</div>`;
+    }
+    case 'loveofficial': {
+      const col = who => {
+        const rank = officialRank(who), max = Math.max(1, ...rank.map(x=>x.p));
+        const inputs = LANGS.map(l => { const p = offPct(who, l.id);
+          return `<div class="lo-in"><span>${l.n}</span><div class="unit"><input class="num" inputmode="decimal" data-k="${K(`pct.${who}.${l.id}`)}" value="${p===null?'':esc(p)}" aria-label="${esc(who==='me'?ME():YOU())}の${l.n}"><span>%</span></div></div>`; }).join('');
+        const ranked = rank.length ? rank.map(x => `<div class="lo-rank"><span class="lo-pos">${x.p===0?'—':(1+rank.filter(y=>y.p>x.p).length)+'位'}</span><span>${x.n}</span>
+            <div class="llbar ${who==='you'?'you':''}"><i style="width:${x.p/max*100}%"></i></div><b>${x.p}%</b></div>`).join('')
+          + (rank.some(x=>x.p===0) ? `<p class="fhint">0% の言語は、本人にはあまり響きにくい表現（公式では Foreign）。</p>` : '')
+          : `<p class="hint">まだ入っていません。</p>`;
+        return `<div class="field"><span class="who">${esc(who==='me'?ME():YOU())}</span>${ranked}<details class="lo-edit" data-lo="${who}" ${S.loEdit[who]?'open':''}><summary>割合を${rank.length?'直す':'書く'}</summary>${inputs}</details></div>`;
+      };
+      return `<div class="grid2">${SOLO?'':col('me')}${col('you')}</div>
+        ${formField(K, {f:'fit', l:'結果、当たってると思う？', pair:true, ph:'例：1位は当たってる。プレゼント0%は意外だった'})}
+        <div class="fhint">公式の30問診断（無料・約4分・英語）：<a href="https://5lovelanguages.com/" target="_blank" rel="noopener">5lovelanguages.com</a></div>`;
+    }
+    case 'lovegap':
+      return loveInsights().map(b=>`<div class="sm-card"><b>${esc(b.title)}</b>
+          ${b.lines.length ? `<ul>${b.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>` : `<p class="hint">ミニ診断か「嬉しいこと」を選ぶと出ます。</p>`}
+          ${b.gap ? `<div class="callout" style="margin-top:6px">${esc(b.gap)}</div>` : ''}</div>`).join('');
+    case 'hwsum':
+      return `<div class="result"><span class="k">家事全体</span><output data-calc="hw.all" data-fmt="pair"></output></div>
+        <div class="hint"><output data-calc="hw.hours"></output></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>${esc(ME())}</span><span><i style="background:var(--you-soft)"></i>${esc(YOU())}</span></div>
+        <div class="hwsum">${HW_CATS.map(cat=>`<div class="hwsum-row"><span>${cat.name}</span><div class="hwbar"><i data-bar="hwc.${cat.id}"></i></div><output data-calc="hwc.${cat.id}" data-fmt="pct">—</output></div>`).join('')}</div>
+        <div class="result"><span class="k">参考：毎月のお金の負担</span><output data-calc="money.pct" data-fmt="pair"></output></div>
+        <div class="callout">お金と家事は単純に交換しません。並べて見て、どちらか一方に偏りすぎていないかを確かめるためのものです。</div>`;
+    case 'hwcat': {
+      const cat = HW_CATS.find(x=>x.id===c.id);
+      const rows = card(t,c.id).v.rows || [];
+      return `<div class="rows">
+        ${cat.tasks.map(([id,l])=>hwRow(K, `hw.${cat.id}.${id}`, id, `<div class="name">${esc(l)}</div>`)).join('')}
+        ${rows.map((r,i)=>hwRow(K, `hw.${cat.id}.rows.${i}`, `rows.${i}`, `<div class="name">${txt(K(`rows.${i}.name`),'家事の名前')}</div>`,
+            `<button type="button" class="del" data-act="delrow" data-card="${t}|${c.id}" data-i="${i}" aria-label="この家事を消す">✕</button>`)).join('')}
+      </div>
+      <button type="button" class="add" data-act="addrow" data-card="${t}|${c.id}">＋ 家事を追加</button>
+      <div class="result"><span class="k">${esc(cat.name)}の割合</span><output data-calc="hwc.${cat.id}" data-fmt="pair"></output></div>`;
+    }
+    case 'checks':
+      return `<div class="checks">${c.items.map(([f,l])=>`<label class="ck"><input type="checkbox" data-k="${K(f)}" ${kv(K(f))?'checked':''}><span>${l}</span></label>`).join('')}</div>`;
+    case 'change':
+      return `<div class="field"><span class="flabel">緊急資金は、最低限の生活費の何か月分？</span>
+          <div style="max-width:220px">${numIn(K('months'),'か月分','何か月分')}</div></div>
+        <div class="field"><label>収入が下がったとき、見直す順番</label>${area(K('order'),'例：共通の変動費・将来の貯金 → 負担割合と家事 → 大きな買い物や行事の時期 → 家賃などの固定費')}</div>`;
+  }
+  return '';
+}
+
+/* ---------- 5つの愛の言語 ---------- */
+const zeroLang = () => Object.fromEntries(LANGS.map(l => [l.id, 0]));
+function quizScore(who){
+  const c = zeroLang(); let n = 0;
+  LOVE_Q.forEach((x,i) => { const a = getV('love','quiz',`q${i}.${who}`); if(a){ n++; c[(a==='a'?x.a:x.b)[0]]++; } });
+  return {c, n};
+}
+// 公式診断の割合。書き換えていなければ初期値（空にしたら「なし」）
+function offPct(who, id){
+  const v = getV('love','official',`pct.${who}.${id}`);
+  return v !== undefined ? num(v) : (OFFICIAL_SEED[who]?.[id] ?? null);
+}
+const hasOfficial = who => LANGS.some(l => offPct(who, l.id) !== null);
+// 受け取り方：ミニ診断＋「嬉しいこと」の案＋公式診断（30%≒ミニ診断の満点4点）
+function receiveScore(who){
+  const c = quizScore(who).c;
+  for(const id of getV('love','talk',`receive.t.${who}`) || []){ const l = id.split(':')[0]; if(l in c) c[l]++; }
+  for(const l of LANGS){ const p = offPct(who, l.id); if(p !== null) c[l.id] += p/7.5; }
+  return c;
+}
+function officialRank(who){
+  return LANGS.map(l => ({...l, p:offPct(who, l.id)})).filter(x => x.p !== null).sort((a,b) => b.p - a.p);
+}
+function expressScore(who){
+  const c = zeroLang();
+  for(const id of getV('love','talk',`express.t.${who}`) || []){ const l = id.split(':')[0]; if(l in c) c[l]++; }
+  return c;
+}
+const topLangs = c => { const m = Math.max(...Object.values(c)); return m > 0 ? LANGS.filter(l => c[l.id]===m).map(l => l.id) : []; };
+const langNames = ids => ids.map(id => `「${LANG[id].n}」`).join('');
+function loveInsights(){
+  return [['me','you'],['you','me']].map(([g, r]) => {
+    const G = g==='me'?ME():YOU(), Rn = r==='me'?ME():YOU();
+    const rt = topLangs(receiveScore(r)), gt = topLangs(expressScore(g));
+    const lines = rt.length ? [`${Rn}は${langNames(rt)}で大切にされていると感じやすいかも`, ...rt.map(id => `ヒント：${LANG[id].tip}`)] : [];
+    const gap = (rt.length && gt.length && !gt.some(x => rt.includes(x)))
+      ? `${G}は${langNames(gt)}で伝えがち。${Rn}には${langNames(rt)}も添えると届きやすそう` : '';
+    return {title:`${Rn}に伝わりやすいこと`, lines, gap};
+  });
+}
+function renderLoveLink(){
+  return `<section class="q"><div class="q-head"><div class="q-title"><h3>まずは公式の診断から</h3>
+      <p class="hint">どんなことをされると「大切にされている」と感じるかを、5つ（言葉・一緒の時間・プレゼント・行動・スキンシップ）に分ける診断です。無料・30問・約4分。英語ですが、Safari の「ぁあ」→「日本語に翻訳」で読めます。</p></div></div>
+    <div class="q-body"><a class="btn pri" href="https://5lovelanguages.com/" target="_blank" rel="noopener">公式サイトを開く</a>
+      <p class="fhint">開いたら「Take the Quiz」（クイズを受ける）から始めます。終わったら、結果の割合（%）を下の「割合を書く」に入れてください。</p></div></section>`;
+}
+function renderLoveAbout(){
+  return `<section class="q"><div class="q-head"><div class="q-title"><h3>5つの愛の言語って？</h3>
+      <p class="hint">アメリカの結婚カウンセラー、ゲーリー・チャップマンが1992年に提唱した考え方。どんなことをされると「愛されている」と感じるかを5つに分けます。</p></div></div>
+    <div class="q-body"><div class="ll-grid">${LANGS.map((l,i)=>`<div class="ll"><span class="ll-n">${i+1}</span><b>${l.n}</b><span>${l.d}</span><small>例：${l.ex}</small></div>`).join('')}</div>
+      <div class="callout">「受け取ると嬉しい方法」と「自分から伝える方法」は同じとは限りません。また、人に必ず1つの主な言語がある、タイプを合わせるほど関係が良くなる、という点には強い裏付けがなく、どの表現も大切で1つに絞らない方がよいという研究もあります。診断は正解ではなく、話すきっかけに。</div>
+      <div class="fhint">公式の30問診断（無料・約4分・英語。ブラウザの翻訳で日本語でも使えます）：<a href="https://5lovelanguages.com/" target="_blank" rel="noopener">5lovelanguages.com</a></div>
+    </div></section>`;
+}
+
+function hwRow(K, calcBase, fb, nameHtml, delBtn=''){
+  const pv = kv(K(fb+'.pct'));
+  return `<div class="hw-row">${nameHtml}
+    <div class="hw-slider">
+      <span class="hw-who me">${esc(ME())}<output data-calc="${calcBase}.me" data-fmt="pct">—</output></span>
+      <input type="range" min="0" max="100" step="10" class="${pv===''?'unset':''}" data-k="${K(fb+'.pct')}" value="${pv===''?50:esc(pv)}" aria-label="${esc(ME())}の割合">
+      <span class="hw-who you"><output data-calc="${calcBase}.you" data-fmt="pct">—</output>${esc(YOU())}</span>
+    </div>
+    ${numIn(K(fb+'.h'), '時間/週', '週あたりの時間')}
+    <div class="hw-x"><button type="button" class="seg-b" data-pick="${K(fb+'.tool')}" data-val="y" aria-pressed="${kv(K(fb+'.tool'))==='y'}">家電・外注</button>${delBtn}</div>
+  </div>`;
+}
+
+function renderCard(t, c){
+  const sh = c.hint ? fmt(c.hint).replace(/このカードは「まとめ」.*$/, '') : '';
+  if(SOLO) return soloCard(t, c) ? `<section class="q" id="q-${t}-${c.id}"><div class="q-head"><div class="q-title"><h3>${esc(fmt(c.title))}</h3>${sh?`<p class="hint">${esc(sh)}</p>`:''}</div></div>
+      <div class="q-body">${renderCardBody(t,c)}</div></section>` : '';
+  const C = card(t, c.id), key = `${t}|${c.id}`;
+  const collapsed = C.st==='ok' && !S.open[key];
+  const memoOpen = S.memo[key] || !!C.v._memo;
+  const head = `<div class="q-head"><div class="q-title"><h3>${esc(fmt(c.title))}</h3>${c.hint&&!collapsed?`<p class="hint">${esc(fmt(c.hint))}</p>`:''}</div>
+      <div class="q-st">${seg(`${key}|@st`, STATUS, 'sm st')}</div></div>`;
+  if(collapsed){
+    const lines = cardLines(t, c, compute()).slice(0, 8);
+    return `<section class="q collapsed" data-st="ok" id="q-${t}-${c.id}">${head}
+      <div class="q-sum">${lines.map(l=>`<span>${esc(short(l,48))}</span>`).join('')}<button type="button" class="mini" data-act="open" data-card="${key}">開いて直す</button></div></section>`;
+  }
+  const needDate = C.st==='tmp' || C.st==='hold';
+  return `<section class="q" data-st="${C.st}" id="q-${t}-${c.id}">${head}
+    <div class="q-body">${renderCardBody(t,c)}</div>
+    <div class="q-foot">
+      ${needDate?`<label class="lbl" for="nx-${t}-${c.id}">次に確認する日</label><input type="date" class="date" id="nx-${t}-${c.id}" data-k="${key}|@next" value="${esc(C.next)}">`:''}
+      ${memoOpen?'':`<button type="button" class="mini" data-act="memo" data-card="${key}">メモを書く</button>`}
+      ${C.st==='ok'?`<button type="button" class="mini" data-act="fold" data-card="${key}">たたむ</button>`:''}
+      <span class="at">${C.at?'更新 '+fmtAt(C.at):''}</span></div>
+    ${memoOpen?`<div class="memo-wrap">${area(`${key}|_memo`,'話し合いのメモ。理由や条件、次に確認したいことなど','メモ')}</div>`:''}
+  </section>`;
+}
+
+/* ---------- カードの中身を短い文に（たたんだ表示・まとめ・コピー用） ---------- */
+const ST_LABEL = {ok:'決定', tmp:'仮', hold:'保留', '':'まだ'};
+const short = (s, n=60) => { s = String(s).replace(/\s+/g,' ').trim(); return s.length>n ? s.slice(0,n)+'…' : s; };
+function tagLines(L, name, st){
+  if(st.both.length) L.push(`${name}（二人とも）：${st.both.join('・')}`);
+  if(st.me.length || st.you.length) L.push(`${name}：${ME()}「${st.me.join('・')||'—'}」／${YOU()}「${st.you.join('・')||'—'}」`);
+}
+function cardLines(t, c, R){
+  const v = card(t,c.id).v, L = [];
+  const optL = (opts,val) => { const o = opts.find(x=>x[0]===val); return o ? fmt(o[1]) : ''; };
+  const K = f => `${t}|${c.id}|${f}`;
+  switch(c.type){
+    case 'form':
+      for(const fd of c.fields){
+        const name = fd.l ? cleanL(fd.l) : fmt(c.title);
+        if(fd.opts){
+          const m = optLabel(fd.opts, v[fd.f], v[fd.f+'.other']), a = optLabel(fd.opts, v[fd.f+'.me'], v[fd.f+'.me.other']), b = optLabel(fd.opts, v[fd.f+'.you'], v[fd.f+'.you.other']);
+          if(m) L.push(`${name}：${m}`);
+          if((a||b) && !(a===m && b===m)) L.push(`${name}（それぞれ）：${ME()}「${a||'—'}」／${YOU()}「${b||'—'}」`);
+        } else if(fd.tags){
+          tagLines(L, name, tagState(K, fd.f, fd.tags));
+        } else if(fd.num){ if(num(v[fd.f])!==null) L.push(`${name}：${v[fd.f]}${fd.num}`); }
+        else if(fd.pair){
+          if(fd.sugg) tagLines(L, name, tagState(K, fd.f+'.t', fd.sugg));
+          const a=v[fd.f+'.me'], b=v[fd.f+'.you'];
+          if(a||b) L.push(`${name}${fd.sugg?'（くわしく）':''}：${ME()}「${short(a||'—')}」／${YOU()}「${short(b||'—')}」`);
+        }
+        else if(fd.text){
+          if(fd.multi){ const sel = multiLabels(K, fd.f+'.t', fd.multi); if(sel.length) L.push(`${name}：${sel.join('・')}`); }
+          if(v[fd.f]) L.push(`${name}${fd.multi?'（くわしく）':''}：${short(v[fd.f],80)}`);
+        }
+      }
+      break;
+    case 'grid':
+      for(const r of c.rows){ if(!Array.isArray(r)) continue; const o = optL(c.opts, v[r[0]]); if(o) L.push(`${fmt(r[1])}：${o}`); }
+      break;
+    case 'checks': { const n = c.items.filter(i=>v[i[0]]).length; if(n) L.push(`${n} / ${c.items.length} 確認済み`); break; }
+    case 'change':
+      if(num(v.months)!==null) L.push(`緊急資金：生活費の${v.months}か月分`);
+      if(v.order) L.push(`見直す順番：${short(v.order,80)}`);
+      break;
+    case 'monthly':
+      for(const k of MONTHLY){
+        const tot = num(v[k]); if(tot===null) continue;
+        const def = RULE_ROWS.find(r=>r[0]===k), me = R[`m.${k}.me`], you = R[`m.${k}.you`];
+        L.push(`${def[1]} ${fmtN(tot)}万円（${ruleText(k).text}）${me!=null&&you!=null?` → ${ME()} ${fmtN(me)}万／${YOU()} ${fmtN(you)}万`:''}`);
+      }
+      if(R['F.me']!=null) L.push(`毎月の負担：${ME()} ${fmtN(R['F.me'])}万円／${YOU()} ${fmtN(R['F.you'])}万円`);
+      break;
+    case 'cap': if(R['G.me']!=null || R['G.you']!=null) L.push(`残る余裕：${ME()} ${fmtN(R['G.me'])}万円／${YOU()} ${fmtN(R['G.you'])}万円`); break;
+    case 'single':
+      if(R[c.id+'.sub']!=null) L.push(`${c.subtotal}：${fmtN(R[c.id+'.sub'])}万円`);
+      if(c.reserve && R['home.cap']!=null) L.push(`新居準備の上限：${fmtN(R['home.cap'])}万円`);
+      break;
+    case 'cash':
+      if(R['need.me']!=null) L.push(`負担する額：${ME()} ${fmtN(R['need.me'])}万円／${YOU()} ${fmtN(R['need.you'])}万円`);
+      if(R['cash.diff.me']!=null || R['cash.diff.you']!=null) L.push(`出せる現金との差：${ME()} ${fmtN(R['cash.diff.me'])}万円／${YOU()} ${fmtN(R['cash.diff.you'])}万円`);
+      break;
+    case 'pay': for(const r of (v.rows||[])) if(r.item) L.push(`${r.item}${r.month?`（${r.month}）`:''}${r.amt?` ${r.amt}万円`:''}${r.bearer?` 負担：${r.bearer}`:''}`); break;
+    case 'furniture': {
+      const g = {me:[], you:[], buy:[], later:[]};
+      for(const [f,l] of c.items){ const h = v[f+'.how']; if(g[h]) g[h].push(l + (h==='buy' && num(v[f+'.budget'])!==null ? `（${v[f+'.budget']}万）` : '')); }
+      if(g.buy.length) L.push(`買う：${g.buy.join('、')}（合計 ${fmtN(R.furn)}万円）`);
+      if(g.me.length) L.push(`${ME()}が持参：${g.me.join('、')}`);
+      if(g.you.length) L.push(`${YOU()}が持参：${g.you.join('、')}`);
+      if(g.later.length) L.push(`後回し：${g.later.join('、')}`);
+      break;
+    }
+    case 'lovequiz': {
+      for(const who of ['me','you']){
+        const s = quizScore(who); if(!s.n) continue;
+        L.push(`ミニ診断（${s.n}/10問）：${who==='me'?ME():YOU()}は${langNames(topLangs(s.c))}が高め`);
+      }
+      break;
+    }
+    case 'loveofficial': {
+      for(const who of ['me','you']){
+        const r = officialRank(who); if(!r.length) continue;
+        L.push(`公式診断：${who==='me'?ME():YOU()}は ${r.map(x=>`${x.n}${x.p}%`).join('・')}`);
+      }
+      const a = v['fit.me'], b = v['fit.you'];
+      if(a||b) L.push(`当たってる？：${ME()}「${short(a||'—')}」／${YOU()}「${short(b||'—')}」`);
+      break;
+    }
+    case 'lovegap': loveInsights().forEach(b => { if(b.lines[0]) L.push(b.lines[0]); if(b.gap) L.push(b.gap); }); break;
+    case 'hwsum': if(R['hw.all']!=null) L.push(`家事全体：${ME()} ${Math.round(R['hw.all'])}%／${YOU()} ${100-Math.round(R['hw.all'])}%`); break;
+    case 'hwcat': {
+      const cat = HW_CATS.find(x=>x.id===c.id);
+      cat.tasks.map(([id,l])=>[l, num(v[id+'.pct'])]).concat((v.rows||[]).map(r=>[r.name||'（名前なし）', num(r.pct)]))
+        .filter(x=>x[1]!==null).forEach(([l,p]) => L.push(`${l}：${ME()} ${p}%／${YOU()} ${100-p}%`));
+      break;
+    }
+  }
+  if(v._memo) L.push(`メモ：${short(v._memo,100)}`);
+  return L;
+}
+
+/* ---------- まとめページ ---------- */
+const passFilter = st => S.sumFilter==='all' || (S.sumFilter==='done' ? (st==='ok'||st==='tmp') : (st==='hold'||!st));
+function flowLines(){
+  const C = card('flow','timeline');
+  return FLOW.map(m => `${C.v[m.id+'.when'] ?? m.when}　${fmt(m.what)}${C.v[m.id+'.st']==='ok'?'（決定）':C.v[m.id+'.st']==='tmp'?'（仮）':''}`);
+}
+function summaryData(){
+  const R = compute(), out = [];
+  for(const t of TOPICS){
+    if(!t.cards.length) continue;
+    const items = [];
+    for(const c of t.cards){
+      if(c.private) continue;  // 距離感などは、画面で見るだけにしてコピーには出さない
+      const C = card(t.id,c.id); if(!passFilter(C.st)) continue;
+      const lines = cardLines(t.id, c, R);
+      if(!lines.length && !C.st && S.sumFilter!=='open') continue;
+      items.push({title:fmt(c.title), st:C.st, next:C.st!=='ok'?C.next:'', lines});
+    }
+    if(items.length) out.push({topic:t, items});
+  }
+  return out;
+}
+function summaryText(){
+  const d = new Date(), out = [`結婚準備ノート まとめ（${d.getMonth()+1}/${d.getDate()}）`, '', '■ これからの流れ', ...flowLines().map(l=>'・'+l),
+    '', '■ 12/19（プロポーズ目安）までにやること', ...taskLines()];
+  for(const blk of summaryData()){
+    out.push('', `■ ${blk.topic.title}`);
+    for(const it of blk.items){
+      out.push(`・${it.title}【${ST_LABEL[it.st]}】${it.next?` 次に確認 ${it.next}`:''}`);
+      it.lines.forEach(l => out.push(`　- ${l}`));
+    }
+  }
+  return out.join('\n');
+}
+function renderSummaryPage(){
+  const data = summaryData();
+  const filt = [['all','全部'],['done','決定・仮'],['open','保留・まだ（次に話すこと）']];
+  return `<div class="sm-tools">
+      <div class="seg" role="group">${filt.map(([v,l])=>`<button type="button" class="seg-b" data-act="sumf" data-val="${v}" aria-pressed="${S.sumFilter===v}">${l}</button>`).join('')}</div>
+      <button type="button" class="btn pri" data-act="copy">文章でコピー</button>
+    </div>
+    <textarea class="area copybox" id="copyBox" hidden readonly aria-label="コピー用の文章"></textarea>
+    <div class="cards">
+      <section class="q"><div class="q-head"><div class="q-title"><h3>これからの流れ</h3></div></div>
+        <div class="q-body"><ul style="margin:0;padding-left:1.2em">${flowLines().map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div></section>
+      ${data.length ? data.map(blk=>`<section class="q"><div class="q-head"><div class="q-title"><h3>${esc(blk.topic.title)}</h3></div>
+          <button type="button" class="mini" data-go="${blk.topic.id}">このページを開く</button></div>
+        <div class="q-body">${blk.items.map(it=>`<div class="sm-card"><div class="sm-h"><b>${esc(it.title)}</b><span class="chip ${it.st}">${ST_LABEL[it.st]}</span>${it.next?`<span class="chip">次に確認 ${esc(it.next)}</span>`:''}</div>
+          ${it.lines.length?`<ul>${it.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>`:''}</div>`).join('')}</div></section>`).join('')
+        : `<div class="callout">まだ何も書かれていません。「どんな家庭にしたいか」から始めてみてください。</div>`}
+    </div>`;
+}
+/* ---------- ふたりの答え合わせ：二人とも／それぞれ／分かれたところ ---------- */
+const MATCH_TOPICS = ['couple','vision','love','fun'];
+const NONE = {both:[], me:[], you:[]};
+function matchItems(t, c){
+  const v = card(t, c.id).v, K = f => `${t}|${c.id}|${f}`, out = [];
+  const add = (name, st, meT='', youT='', noDiff=false) => {
+    const both = st.both, me = st.me.filter(x => !both.includes(x)), you = st.you.filter(x => !both.includes(x));
+    if(!both.length && !me.length && !you.length && !meT && !youT) return;
+    out.push({name, both, me, you, meT, youT, diff: !noDiff && !!(st.me.length && st.you.length && !both.length)});
+  };
+  if(c.type==='form') for(const fd of c.fields){
+    const name = fd.l ? cleanL(fd.l) : fmt(c.title);
+    if(fd.tags) add(name, tagState(K, fd.f, fd.tags));
+    else if(fd.pair) add(name, fd.sugg ? tagState(K, fd.f+'.t', fd.sugg) : NONE, v[fd.f+'.me']||'', v[fd.f+'.you']||'');
+    else if(fd.opts && !fd.noSplit){
+      const a = optLabel(fd.opts, v[fd.f+'.me'], v[fd.f+'.me.other']), b = optLabel(fd.opts, v[fd.f+'.you'], v[fd.f+'.you.other']);
+      add(name, {both: a && a===b ? [a] : [], me: a ? [a] : [], you: b ? [b] : []});
+    }
+  }
+  if(c.type==='loveofficial'){
+    const r = who => officialRank(who).map(x => `${x.n} ${x.p}%`);
+    add('公式診断の結果（高い順）', {both:[], me:r('me'), you:r('you')}, '', '', true);
+    add('当たってる？', NONE, v['fit.me']||'', v['fit.you']||'');
+  }
+  return out;
+}
+// forText：LINEに送る文章用。距離感など private のカードは入れない
+function matchData(forText){
+  return MATCH_TOPICS.map(id => {
+    const T = topicOf(id), items = [];
+    for(const c of T.cards) if(!(forText && c.private)) matchItems(id, c).forEach(x => items.push({...x, priv:!!c.private}));
+    const notes = id==='love' && items.length ? loveInsights().flatMap(b => [b.lines[0], b.gap]).filter(Boolean) : [];
+    return {T, items, notes};
+  }).filter(d => d.items.length);
+}
+const mtEach = x => x.me.length || x.you.length || x.meT || x.youT;
+function matchText(){
+  const d = new Date(), data = matchData(true);
+  const L = [`ふたりの答え合わせ（${d.getMonth()+1}/${d.getDate()}）`, `${ME()}と${YOU()}、それぞれの答えを並べました。`];
+  const side = (n, labels, t) => (labels.length || t) ? `　${n}：${labels.join('・')}${t ? `${labels.length?' ':''}「${short(t, 120)}」` : ''}` : '';
+  for(const {T, items, notes} of data){
+    L.push('', `■ ${T.title}`);
+    const both = items.filter(x => x.both.length), each = items.filter(mtEach);
+    if(both.length){ L.push('◎ 二人とも'); both.forEach(x => L.push(`・${x.name}：${x.both.join('・')}`)); }
+    if(each.length){ L.push(both.length ? '◇ それぞれ（上のほか）' : '◇ それぞれ');
+      each.forEach(x => { L.push(`・${x.name}`); [side(ME(), x.me, x.meT), side(YOU(), x.you, x.youT)].filter(Boolean).forEach(l => L.push(l)); }); }
+    notes.forEach(n => L.push(`・ヒント：${n}`));
+  }
+  const talk = data.flatMap(d => d.items.filter(x => x.diff));
+  if(talk.length){ L.push('', '■ 次に話してみたいこと（答えが分かれたところ）'); talk.forEach(x => L.push(`・${x.name}`)); }
+  return L.join('\n');
+}
+function renderMatch(){
+  const data = matchData(false), talk = data.flatMap(d => d.items.filter(x => x.diff));
+  const nBoth = data.reduce((n, d) => n + d.items.reduce((m, x) => m + x.both.length, 0), 0);
+  const chips = (arr, cls) => arr.map(l => `<span class="mt-chip ${cls}">${esc(l)}</span>`).join('');
+  const side = (n, cls, labels, t) => (labels.length || t) ? `<div class="mt-side"><span class="who">${esc(n)}</span><div>${chips(labels, cls)}${t ? `<p class="mt-q">「${esc(t)}」</p>` : ''}</div></div>` : '';
+  const name = x => `<span class="mt-name">${esc(x.name)}${x.priv?'<small>（画面だけ・LINEには入れません）</small>':''}${x.diff?'<span class="chip tmp">話してみたい</span>':''}</span>`;
+  const share = `<section class="q"><div class="q-head"><div class="q-title"><h3>LINEで共有する</h3>
+      <p class="hint">下の答え合わせを、読みやすい文章にしてコピーします。トークにそのまま貼れば、${esc(YOU())}もLINEの中で読めます。「距離感とペース」のカードは入りません。</p></div></div>
+    <div class="q-body"><button type="button" class="btn pri" data-act="mcopy">LINEに送る文章をコピー</button>
+      <p class="hint" id="mmsg" aria-live="polite"></p>
+      <textarea class="area copybox" id="mBox" hidden readonly aria-label="送る文章"></textarea></div></section>`;
+  if(!data.length) return `<div class="cards"><div class="callout">まだ答えがありません。${esc(YOU())}から届いた文章を「まとめ」で取り込むと、ここに並びます。</div></div>`;
+  const top = `<section class="q"><div class="q-body">
+      <div class="result"><span class="k">二人とも選んだもの</span><span>${nBoth}個</span><span class="k">答えが分かれたところ</span><span>${talk.length}か所</span></div>
+      ${talk.length ? `<div class="mt-h">次に話してみたいこと</div><ul class="mt-notes" style="margin-top:4px">${talk.map(x => `<li>${esc(x.name)}</li>`).join('')}</ul>` : ''}</div></section>`;
+  const blocks = data.map(({T, items, notes}) => {
+    const both = items.filter(x => x.both.length), each = items.filter(mtEach);
+    return `<section class="q"><div class="q-head"><div class="q-title"><h3>${esc(T.title)}</h3></div>
+        <button type="button" class="mini" data-go="${T.id}">このページを開く</button></div>
+      <div class="q-body">
+        ${both.length ? `<div class="mt-h">二人とも</div>${both.map(x => `<div class="mt-row">${name({...x, diff:false})}<div>${chips(x.both, 'both')}</div></div>`).join('')}` : ''}
+        ${each.length ? `<div class="mt-h">${both.length ? 'それぞれ（上のほか）' : 'それぞれ'}</div>${each.map(x => `<div class="mt-row">${name(x)}${side(ME(), 'me', x.me, x.meT)}${side(YOU(), 'you', x.you, x.youT)}</div>`).join('')}` : ''}
+        ${notes.length ? `<div class="mt-h">ヒント</div><ul class="mt-notes" style="margin-top:4px">${notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+      </div></section>`;
+  }).join('');
+  return `<div class="cards">${share}${top}${blocks}</div>`;
+}
+
+function fmtAt(iso){ const d=new Date(iso); if(isNaN(d)) return ''; return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+
+const cleanL = l => fmt(l).replace(/（いくつでも）/,'');
+
+/* ---------- 上の段で決まったこと ---------- */
+function decidedIn(tid, onlyCards){
+  const T = topicOf(tid), out = [];
+  for(const c of T.cards){
+    if(onlyCards && !onlyCards.includes(c.id)) continue;
+    if(c.type==='form'){
+      for(const fd of c.fields){
+        const v = getV(tid,c.id,fd.f);
+        if(fd.opts && v){ const o = optLabel(fd.opts, v, getV(tid,c.id,fd.f+'.other')); if(o) out.push([fmt(fd.l||c.title), o]); }
+        else if(fd.num && num(v)!==null) out.push([fmt(fd.l), `${v}${fd.num}`]);
+        else if(fd.tags){ const b = tagBoth(f=>`${tid}|${c.id}|${f}`, fd); if(b.length) out.push([cleanL(fd.l)+'（二人とも）', b.join('・')]); }
+        else if(fd.pair && fd.sugg){ const b = tagState(f=>`${tid}|${c.id}|${f}`, fd.f+'.t', fd.sugg).both; if(b.length) out.push([cleanL(fd.l)+'（二人とも）', b.join('・')]); }
+        else if(fd.text && fd.multi){ const sel = multiLabels(f=>`${tid}|${c.id}|${f}`, fd.f+'.t', fd.multi); if(sel.length) out.push([cleanL(fd.l), sel.join('・')]); }
+      }
+    } else if(c.type==='grid'){
+      for(const r of c.rows){ if(!Array.isArray(r)) continue; const v=getV(tid,c.id,r[0]); if(!v) continue;
+        const o=c.opts.find(x=>x[0]===v); if(o) out.push([fmt(r[1]), fmt(o[1])]); }
+    }
+  }
+  return out;
+}
+const UPSTREAM = {
+  policy:[['vision'],['fun',['holiday','travel']]],
+  mrule:[['fun',['money']],['policy']], lrule:[['vision'],['policy']], family:[['vision'],['policy']], future:[['vision'],['fun',['money']]],
+  money:[['mrule',['wallet','base','items']]], start:[['mrule',['wallet','base','items']]], furn:[['mrule',['items']]],
+  hw:[['lrule',['principle']]]
+};
+function renderSummary(tid){
+  const ups = UPSTREAM[tid]; if(!ups) return '';
+  let items = [];
+  for(const [ut, cards] of ups){
+    let d = decidedIn(ut, cards);
+    if(tid==='money') d = d.filter(([l]) => !RULE_ROWS.some(r=>fmt(r[1])===l) || MONTHLY.some(k=>fmt(RULE_ROWS.find(r=>r[0]===k)[1])===l));
+    if(tid==='start') d = d.filter(([l]) => !RULE_ROWS.some(r=>fmt(r[1])===l) || ['start','furn','wed','trip'].some(k=>fmt(RULE_ROWS.find(r=>r[0]===k)[1])===l));
+    if(tid==='furn') d = d.filter(([l]) => l===fmt(RULE_ROWS.find(r=>r[0]==='furn')[1]));
+    items = items.concat(d);
+  }
+  const up = topicOf(ups[0][0]), labels = ups.map(u=>topicOf(u[0]).label).join('・');
+  const body = items.length
+    ? `<div class="known">${items.map(([l,v])=>`<span><b>${esc(l)}</b>${esc(v)}</span>`).join('')}</div>`
+    : `<div class="none">「${labels}」はまだ決まっていません。先にそちらから話すと、このページが話しやすくなります。 <button type="button" class="link" data-go="${up.id}">${up.label}を開く</button></div>`;
+  return `<div class="sumbox"><span class="sh">上の段で決まったこと（${labels}）</span>${body}</div>`;
+}
+
+function topicCounts(t){
+  const T = topicOf(t); const r={ok:0,tmp:0,hold:0,none:0,total:T.cards.length};
+  for(const c of T.cards){ const st=card(t,c.id).st; if(st) r[st]++; else r.none++; }
+  return r;
+}
+
+/* ---------- 12/19までのやること（ガント） ---------- */
+const isoOf = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const md = s => { const d = parseD(s); return d ? `${d.getMonth()+1}/${d.getDate()}` : '—'; };
+const whoLabel = w => fmt((WHO4.find(x=>x[0]===w)||WHO4[2])[1]);
+function taskList(){
+  const v = card('flow','tasks').v;
+  const seeds = FLOW_TASKS.filter(x => !v[x.id+'.hide']).map(x => ({
+    id:x.id, seed:true, go:x.go, cat:x.cat, t:fmt(x.t), s:v[x.id+'.s']||x.s, e:v[x.id+'.e']||x.e, who:v[x.id+'.who']||x.who,
+    done: v[x.id+'.done']!==undefined ? !!v[x.id+'.done'] : !!x.done}));
+  const mine = (v.rows||[]).map((r,i) => ({id:'u'+i, idx:i, seed:false, go:r.go, cat:r.cat, t:r.t||'', s:r.s||'', e:r.e||r.s||'', who:r.who||'both', done:!!r.done}));
+  return seeds.concat(mine).sort((a,b) => (a.e||'9').localeCompare(b.e||'9') || (a.s||'').localeCompare(b.s||''));
+}
+function setTask(id, field, val){
+  const C = card('flow','tasks');
+  if(id[0]==='u'){ const r = (C.v.rows ||= [])[+id.slice(1)]; if(r) r[field] = val; }
+  else { C.v[id+'.'+field] = val; (C.ts ||= {})[id+'.'+field] = Date.now(); }
+  C.at = new Date().toISOString(); saveShared();
+}
+function taskEditor(x){
+  return `<div class="gt-edit">
+        ${x.seed ? '' : `<input class="txt" data-fe="${x.id}|t" value="${esc(x.t)}" placeholder="やること" aria-label="やること" style="flex:1 1 260px">`}
+        <label class="lbl">開始 <input type="date" class="date" data-fe="${x.id}|s" value="${esc(x.s)}"></label>
+        <label class="lbl">期限 <input type="date" class="date" data-fe="${x.id}|e" value="${esc(x.e)}"></label>
+        <div class="seg sm" role="group">${WHO4.map(([v,l])=>`<button type="button" class="seg-b" data-act="ftwho" data-id="${x.id}" data-val="${v}" aria-pressed="${x.who===v}">${esc(fmt(l))}</button>`).join('')}</div>
+        ${x.go ? `<button type="button" class="mini" data-go="${x.go}">${esc(topicOf(x.go).label)}を開く</button>` : ''}
+        <button type="button" class="mini" data-act="ftdel" data-id="${x.id}" style="color:var(--bad)">このやることを消す</button>
+        <button type="button" class="btn" data-act="ftclose">閉じる</button></div>`;
+}
+// プロポーズまでのやること：グループごとの箇条書き。抜けの確認と追加はここで
+function renderTaskList(){
+  const all = taskList(), list = all.filter(x => !x.e || x.e <= P_TARGET), used = new Set(all.map(x => x.t));
+  const tIso = isoOf(today0()), left = list.filter(x => !x.done).length;
+  const st = tagState(f => `flow|dates|${f}`, 'idea', DATE_IDEAS);
+  const dates = [...new Set([...st.both, ...st.me, ...st.you])].map(l => ({cat:'date', t:`デート：${l}`, both:st.both.includes(l)}));
+  const cand = TASK_CAND.map(c => ({...c, t:fmt(c.t)})).concat(dates).filter(c => !used.has(c.t));
+  const groups = TASK_CATS.map(([cat, label]) => {
+    const items = list.filter(x => (x.cat || 'other')===cat).sort((a,b) => a.done - b.done), cs = cand.filter(c => c.cat===cat);
+    if(cat==='other' && !items.length) return '';
+    const rows = items.map(x => {
+      const late = !x.done && x.e && x.e < tIso;
+      return `<li class="tk-item ${x.done?'done':''}"><input type="checkbox" data-ft="${x.id}" ${x.done?'checked':''} aria-label="${esc(x.t)}を完了にする">
+        <button type="button" class="tk-t" data-act="ftedit" data-in="list" data-id="${x.id}">${esc(x.t||'（名前なし）')}
+          <small>${esc(whoLabel(x.who))}・${md(x.e)}まで${late?'　<b class="late-t">期限を過ぎています</b>':''}</small></button></li>
+        ${S.editTask===x.id && S.editIn==='list' ? `<li>${taskEditor(x)}</li>` : ''}`;
+    }).join('');
+    return `<div class="tk-group"><div class="tk-gh">${esc(label)}<span>${items.filter(x => !x.done).length ? `残り ${items.filter(x => !x.done).length}` : items.length ? '全部済み' : ''}</span></div>
+      <ul class="tk-list">${rows || '<li class="tk-none">まだありません</li>'}</ul>
+      <div class="tk-cand">${cs.map(c => `<button type="button" class="seg-b add-chip${c.both?' both':''}" data-act="ftcand" data-cat="${c.cat}" data-t="${esc(c.t)}" data-who="${c.who||'both'}" data-go="${c.go||''}">＋ ${esc(c.t)}${c.both?'（二人とも）':''}</button>`).join('')}
+        <button type="button" class="seg-b add-chip" data-act="ftadd" data-cat="${cat}">＋ 自分で書く</button></div></div>`;
+  }).join('');
+  return `<section class="q"><div class="q-head"><div class="q-title"><h3>プロポーズまでにやること（一覧）</h3>
+      <p class="hint">抜けや余計なものがないか、ここで確かめます。終わったらチェック、タップで日付・担当を直したり消したりできます。点線のボタンは「抜けていそうなこと」の候補で、タップすると一覧に入ります。残り ${left} 件。</p></div></div>
+    <div class="q-body">${groups}</div></section>`;
+}
+function renderGantt(){
+  const W0 = parseD(GANTT_FROM), DAY = 86400000, span = GANTT_WEEKS*7*DAY;
+  const pos = s => { const d = parseD(s); return d ? Math.max(0, Math.min(100, (d - W0)/span*100)) : 0; };
+  const end = s => { const d = parseD(s); return d ? Math.max(0, Math.min(100, (d - W0 + DAY)/span*100)) : 0; };
+  const today = today0(), tIso = isoOf(today), tPos = pos(tIso);
+  const lines = `${tPos>0&&tPos<100?`<i class="gt-today" style="left:${tPos}%"></i>`:''}<i class="gt-p" style="left:${pos(P_TARGET)}%"></i>`;
+  const weeks = Array.from({length:GANTT_WEEKS}, (_,i) => { const d = new Date(W0); d.setDate(d.getDate()+i*7); return `${d.getMonth()+1}/${d.getDate()}〜`; });
+  const list = taskList(), left = list.filter(x => !x.done).length;
+  const rows = list.map(x => {
+    const late = !x.done && x.e && x.e < tIso, soon = !x.done && !late && x.e && (parseD(x.e)-today)/DAY <= 7;
+    const editor = S.editTask === x.id && S.editIn !== 'list' ? taskEditor(x) : '';
+    return `<div class="gt-row ${x.done?'done':''} ${late?'late':''}">
+      <div class="gt-name"><input type="checkbox" data-ft="${x.id}" ${x.done?'checked':''} aria-label="${esc(x.t)}を完了にする">
+        <button type="button" class="gt-title" data-act="ftedit" data-id="${x.id}">${esc(x.t||'（名前なし）')}
+          <small>${esc(whoLabel(x.who))}・${md(x.s)}〜${md(x.e)}${late?'　<b class="late-t">期限を過ぎています</b>':soon?'　<b class="soon-t">もうすぐ期限</b>':''}</small></button></div>
+      <div class="gt-track">${lines}<i class="gt-bar ${x.who}" style="left:${pos(x.s||x.e)}%;width:${Math.max(1.2, end(x.e)-pos(x.s||x.e))}%"></i></div>
+      ${editor}</div>`;
+  }).join('');
+  return `<section class="q"><div class="q-head"><div class="q-title"><h3>やることの日程（ガント）</h3>
+      <p class="hint">上の一覧を、日付の線で見たものです。行をタップすると、日付と担当を直したり消したりできます。残り ${left} 件。</p></div></div>
+    <div class="q-body">
+      <div class="gt"><div class="gt-in">
+        <div class="gt-row gt-head"><div class="gt-name"><span class="lbl">やること</span></div>
+          <div class="gt-track">${lines}<div class="gt-weeks">${weeks.map(w=>`<span>${w}</span>`).join('')}</div>
+            ${tPos>0&&tPos<100?`<span class="gt-tag today" style="left:${tPos}%">今日</span>`:''}<span class="gt-tag p" style="left:${pos(P_TARGET)}%">12/19 目安</span></div></div>
+        ${rows}
+      </div></div>
+      <div class="gt-foot"><button type="button" class="add" data-act="ftadd">＋ やることを追加</button>
+        <div class="legend"><span><i style="background:var(--accent)"></i>${esc(ME())}</span><span><i style="background:var(--you)"></i>${esc(YOU())}</span><span><i style="background:var(--both)"></i>二人で・各自</span><span><i style="background:var(--bad)"></i>期限切れ</span></div></div>
+    </div></section>`;
+}
+function renderRoadmap(){
+  const m = new Date().getMonth()+1, y = new Date().getFullYear();
+  const now = y < 2027 ? (m <= 11 ? 0 : 1) : (m <= 2 ? 2 : m <= 4 ? 3 : 4);
+  const th = RM_COLS.map((c,i) => `<th class="${i===now?'now':''}">${c}${i===now?'<span class="rm-now">今</span>':''}</th>`).join('');
+  const rows = ROADMAP.map(([lane, cells]) => `<tr><th class="rm-lane">${esc(lane)}</th>${cells.map((c,i) =>
+    `<td class="${i===now?'now':''} ${c?'':'empty'}">${c?esc(fmt(c)):'—'}</td>`).join('')}</tr>`).join('');
+  return `<section class="q"><div class="q-head"><div class="q-title"><h3>並行ロードマップ（〜2027年）</h3>
+      <p class="hint">家族・プロポーズ・新居を今から並行で進め、入籍・前撮り・結婚式・新婚旅行はプロポーズのあとに本格的に始めます。時期は目安で、実際の条件（相談所の締切、物件の空き、式場の空き）を優先します。</p></div></div>
+    <div class="q-body"><div class="tbl-wrap"><table class="rm">
+      <thead><tr><th></th><th colspan="2" class="ph ph1">プロポーズまで：結婚するための準備</th><th colspan="3" class="ph ph2">プロポーズ後：結婚生活を始めるための準備</th></tr>
+        <tr><th></th>${th}</tr></thead>
+      <tbody>${rows}</tbody></table></div>
+      <ul class="rm-notes">
+        <li>ドレスは外部ショップでレンタルして持ち込む想定（まだ確認していない）。式場と契約する前に、持ち込みの可否・料金・条件を確認する。</li>
+        <li>結婚式の参考：東京ディズニーシー・ホテルミラコスタの少人数プラン（10〜30名）。2027年度の公式見積例は10名で約208万円（10月時点の情報。要確認）。</li>
+        <li>前撮りの写真を招待状などに使うなら、撮影を早めにする。式の日程が決まったら前撮りの時期を合わせる。</li>
+        <li>結婚式が遅れても、入籍と同居は自動では遅らせない。</li>
+      </ul></div></section>`;
+}
+function taskLines(){
+  return taskList().map(x => `${x.done?'✓':'□'} ${x.t}（${whoLabel(x.who)}・${md(x.e)}まで）`);
+}
+
+function renderFlow(){
+  const C = card('flow','timeline');
+  const ms = FLOW.map(m=>{
+    const when = C.v[m.id+'.when'] ?? m.when, st = C.v[m.id+'.st'] || '';
+    return `<div class="ms ${m.key?'key':''}" data-st="${st}">
+      <div class="when"><input data-k="flow|timeline|${m.id}.when" value="${esc(when)}" aria-label="${esc(fmt(m.what))}の時期"></div>
+      <div class="dot"></div>
+      <div class="what"><b>${esc(fmt(m.what))}</b>${seg(`flow|timeline|${m.id}.st`,[['ok','決定'],['tmp','仮']],'sm')}${m.note?`<span class="note">${esc(fmt(m.note))}</span>`:''}</div>
+    </div>`;}).join('');
+  const prog = GROUPS.filter(g=>g.id!==9).map(g=>`<div class="pg-label">${g.name}　${g.label}</div><div class="pg-row">${
+    TOPICS.filter(t=>t.g===g.id).map(t=>{
+      const r=topicCounts(t.id), w=x=>`${x/r.total*100}%`;
+      return `<button type="button" class="pg" data-go="${t.id}"><b>${t.label}</b>
+        <div class="bar"><i class="ok" style="width:${w(r.ok)}"></i><i class="tmp" style="width:${w(r.tmp)}"></i><i class="hold" style="width:${w(r.hold)}"></i></div>
+        <small>決定 ${r.ok}・仮 ${r.tmp}・保留 ${r.hold}・まだ ${r.none}</small></button>`;}).join('')}</div>`).join('');
+  return `<div class="cards">
+    ${renderTaskList()}
+    ${renderCard('flow', cardDef('flow','dates'))}
+    ${renderGantt()}
+    ${renderRoadmap()}
+    <section class="q"><div class="q-head"><h3>大きな節目</h3><p class="hint">入籍・同居・挙式は別々に決めます。どれかがずれても、ほかを自動では動かしません。</p></div>
+      <div class="q-body"><div class="tl">${ms}</div></div></section>
+    <section class="q"><div class="q-head"><h3>もう決まっていること</h3></div>
+      <div class="q-body"><div class="known">${KNOWN.map(k=>`<span>${esc(k)}</span>`).join('')}</div>
+      <div class="field"><label>ほかに決まったこと・メモ</label>${area('flow|known|memo')}</div></div></section>
+    <section class="q"><div class="q-head"><h3>話し合いの進み具合</h3><p class="hint">上の段から順に。1回20〜30分ずつで十分です。</p></div>
+      <div class="q-body"><div class="progress">${prog}</div></div></section>
+  </div>`;
+}
+
+function renderRail(){
+  document.getElementById('rail').innerHTML = GROUPS.filter(g=>TOPS().some(t=>t.g===g.id)).map(g=>`<div class="rail-group"><span class="rail-label">${g.name?`<b>${g.name}</b>`:''}<span>${g.label}</span></span>
+    ${TOPS().filter(t=>t.g===g.id).map(t=>{
+      const meter = t.cards.length && !SOLO ? `<span class="meter" aria-hidden="true">${t.cards.map(c=>`<i class="${card(t.id,c.id).st}"></i>`).join('')}</span>` : '';
+      return `<button type="button" class="tab" data-go="${t.id}" aria-current="${S.topic===t.id}"><span class="t-name">${t.label}</span>${meter}</button>`;}).join('')}
+  </div>`).join('');
+}
+
+function renderShared(){
+  document.body.classList.remove('self');
+  document.getElementById('modeLabel').textContent = SOLO ? `${YOU()}用` : 'ふたりで見る';
+  document.getElementById('rail').hidden = false;
+  document.querySelector('.shell').style.gridTemplateColumns = '';
+  renderRail();
+  const T = TOPS().includes(topicOf(S.topic)) ? topicOf(S.topic) : TOPS()[0];
+  const G = GROUPS.find(g=>g.id===T.g);
+  document.getElementById('main').innerHTML = `
+    <div class="topic-head"><div class="topic-title"><h2>${T.title}</h2><span class="when">${G.name?G.name+'　':''}${G.label}</span></div><p class="lead">${esc(T.lead)}</p></div>
+    ${T.id===TOPICS[0].id && !lsGet(LS+'intro-hide') ? renderIntro() : ''}
+    ${SOLO ? '' : renderSummary(T.id)}
+    ${T.id==='love' ? `<div class="cards" style="margin-bottom:16px">${SOLO ? renderLoveLink() : renderLoveAbout()}</div>` : ''}
+    ${T.id==='flow' ? (SOLO ? renderSoloFlow() : renderFlow()) : T.id==='match' ? renderMatch() : T.id==='summary' ? (SOLO ? renderSend() : renderSummaryPage() + renderExchange()) : `<div class="cards">${T.cards.map(c=>renderCard(T.id,c)).join('')}</div>`}
+    ${renderPager(T)}`;
+  autosizeAll(); paintCalc();
+}
+/* ---------- {you}版とのやりとり（LINEで文字を送る） ----------
+   送るのは{you}が書く欄だけ（{you}の考え・チップ・文章、「プロポーズのこと」、{you}担当のやることの完了）。
+   {me}の欄・二人の結論は入れない。項目ごとの更新時刻で新しい方を残す */
+const soloCard = (t, c) => t==='propose' || c.type==='loveofficial'
+  || (c.type==='form' && c.fields.some(fd => fd.tags || fd.pair || (fd.opts && !fd.noSplit)));
+// {you}版で出すページ。一人で考えてほしいところだけに絞る（多いと身構えてしまうので）
+const SOLO_TOPICS = ['couple','vision','love','fun','propose','summary'];
+const TOPS = () => SOLO ? TOPICS.filter(t => SOLO_TOPICS.includes(t.id)) : TOPICS;
+function ownedByYou(t, c, f){
+  if(t==='flow'){
+    const id = f.replace(/\.done$/, ''), x = FLOW_TASKS.find(y => y.id===id);
+    return c==='tasks' && f.endsWith('.done') && !!x && (card('flow','tasks').v[id+'.who'] || x.who)==='you';
+  }
+  const d = topicOf(t)?.cards.find(x => x.id===c);
+  if(!d || !soloCard(t, d)) return false;
+  return t==='propose' || /(^|\.)you(\.|$)/.test(f) || /\.x$/.test(f);
+}
+const okVal = x => ['string','number','boolean'].includes(typeof x) || (Array.isArray(x) && x.every(y => typeof y==='string'));
+function exportYou(){
+  const d = {};
+  for(const [t, T] of Object.entries(S.shared)) for(const [c, C] of Object.entries(T.cards || {}))
+    for(const [f, val] of Object.entries(C.v || {}))
+      if(ownedByYou(t, c, f) && okVal(val)) (d[t+'|'+c] ||= {})[f] = [val, C.ts?.[f] || 0];
+  return `結婚準備ノート（${SOLO ? YOU() : ME()}から）\nKN1 ${JSON.stringify({from:EDITION, d})}`;
+}
+// 戻り値：反映した数。読めなければ null
+function importYou(text){
+  const m = /KN1\s+(\{[\s\S]*\})\s*$/.exec(text.trim());
+  let p = null; try{ p = m && JSON.parse(m[1]); }catch(e){}
+  if(!p || !p.d || typeof p.d!=='object') return null;
+  let n = 0;
+  for(const [tc, fields] of Object.entries(p.d)){
+    const [t, c] = tc.split('|');
+    if(!fields || typeof fields!=='object' || (t!=='flow' && !topicOf(t)?.cards.some(x => x.id===c))) continue;
+    for(const [f, pr] of Object.entries(fields)){
+      if(!Array.isArray(pr) || !okVal(pr[0]) || !ownedByYou(t, c, f)) continue;
+      const C = card(t, c), val = pr[0], ts = +pr[1] || 0, lt = C.ts?.[f] || 0, cur = C.v[f];
+      if(f.endsWith('.x') && Array.isArray(val)){  // 自分で足した案は両方を残す
+        const u = [...new Set([...(cur || []), ...val])]; if(u.length !== (cur || []).length){ C.v[f] = u; n++; } continue;
+      }
+      if(ts > lt || cur===undefined){
+        if(JSON.stringify(cur) !== JSON.stringify(val)){ C.v[f] = val; n++; }
+        (C.ts ||= {})[f] = Math.max(ts, lt);
+      }
+    }
+  }
+  if(n) saveShared();
+  return n;
+}
+function copyText(text, box, msg){
+  const say = m => { status(m); const el = document.getElementById(msg); if(el) el.textContent = m; };
+  const long = text.length > 9000 ? '（長いので、送れないときは教えてください）' : '';
+  const fallback = () => { box.value = text; box.hidden = false; autosize(box); box.focus(); box.select(); say('自動でコピーできませんでした。下の文章を全部選んでコピーしてください'); };
+  try{ navigator.clipboard.writeText(text).then(() => say('コピーしました。LINEのトークに貼って送ってください' + long), fallback); }catch(e){ fallback(); }
+}
+function renderReceive(title, hint){
+  return `<section class="q"><div class="q-head"><div class="q-title"><h3>${title}</h3><p class="hint">${hint}</p></div></div>
+    <div class="q-body"><textarea class="area" id="xin" rows="3" placeholder="ここに貼る" aria-label="届いた文章"></textarea>
+      <div class="row-btns" style="justify-content:flex-start;margin-top:8px"><button type="button" class="btn pri" data-act="xrecv">取り込む</button></div>
+      <p class="hint" id="xres" aria-live="polite"></p></div></section>`;
+}
+function renderSend(){
+  return `<div class="cards">
+    <section class="q"><div class="q-head"><div class="q-title"><h3>${esc(ME())}に送る</h3>
+      <p class="hint">ボタンを押すとコピーされます。LINEのトークにそのまま貼って送ってください。送るのは、このノートに書いた${esc(YOU())}の分だけです。</p></div></div>
+      <div class="q-body"><button type="button" class="btn pri" data-act="xsend">送る文章をコピー</button>
+        <p class="hint" id="xmsg" aria-live="polite"></p>
+        <textarea class="area copybox" id="xBox" hidden readonly aria-label="送る文章"></textarea></div></section>
+    ${renderReceive(`${esc(ME())}から受け取る`, `カフェで iPad に書いた分を、このスマホにも反映します。${esc(ME())}から届いた文章を全部コピーして、下に貼ってください。`)}
+  </div>`;
+}
+/*<main>*/
+function renderExchange(){
+  return `<div class="cards" style="margin-top:16px">
+    ${renderReceive(`${esc(YOU())}の分を取り込む`, `${esc(YOU())}用のノートから届いた文章を全部コピーして、下に貼ります。変わるのは${esc(YOU())}の欄だけで、${esc(ME())}の欄と二人の結論はそのままです。`)}
+    <section class="q"><div class="q-head"><div class="q-title"><h3>${esc(YOU())}用のノートを最新にする</h3>
+      <p class="hint">カフェで iPad に書いた${esc(YOU())}の分を、${esc(YOU())}のスマホにも反映したいときに。送るのは${esc(YOU())}の欄とやることのチェックだけです。</p></div></div>
+      <div class="q-body"><button type="button" class="btn" data-act="xsend">${esc(YOU())}に送る文章をコピー</button>
+        <p class="hint" id="xmsg" aria-live="polite"></p>
+        <textarea class="area copybox" id="xBox" hidden readonly aria-label="送る文章"></textarea></div></section>
+    <section class="q"><div class="q-head"><div class="q-title"><h3>ほかの端末へ移す（PC → iPad など）</h3>
+      <p class="hint">この端末に書いた二人の分（呼び方・答え・結論・やること）を全部まとめて、別の端末のノートに移します。移す先で読み込むと、項目ごとに新しい方を残します。プロポーズの準備のページは入りません。</p></div></div>
+      <div class="q-body"><div class="row-btns" style="justify-content:flex-start;flex-wrap:wrap;gap:8px">
+          <button type="button" class="btn pri" data-act="mvsave">ファイルに保存</button>
+          <button type="button" class="btn" data-act="mvcopy">文章でコピー</button></div>
+        <p class="hint" id="mvmsg" aria-live="polite"></p>
+        <textarea class="area copybox" id="mvBox" hidden readonly aria-label="移す文章"></textarea>
+        <h3 style="margin:18px 0 4px;font-size:15px">移す先で読み込む</h3>
+        <p class="hint">保存したファイルを選ぶか、コピーした文章を貼って「読み込む」を押します。</p>
+        <label class="btn" style="display:flex;align-items:center;justify-content:center;margin-top:8px;cursor:pointer">ファイルを選ぶ<input type="file" id="mvfile" accept=".txt,text/plain" hidden></label>
+        <textarea class="area" id="mvin" rows="3" placeholder="ここに貼る" aria-label="移す文章を貼る" style="margin-top:8px"></textarea>
+        <div class="row-btns" style="justify-content:flex-start;margin-top:8px"><button type="button" class="btn" data-act="mvrecv">読み込む</button></div>
+        <p class="hint" id="mvres" aria-live="polite"></p></div></section>
+  </div>`;
+}
+// 引っ越し：二人用のデータを丸ごと別の端末へ。公式診断の初期値も値として入れる（移す先には初期値がないため）
+function exportAll(){
+  const shared = JSON.parse(JSON.stringify(S.shared));
+  for(const [who, o] of Object.entries(OFFICIAL_SEED)) for(const [id, n] of Object.entries(o)){
+    const C = ((shared.love ||= {cards:{}}).cards.official ||= {v:{}, st:'', next:'', at:''});
+    if(C.v[`pct.${who}.${id}`]===undefined) C.v[`pct.${who}.${id}`] = String(n);
+  }
+  return `結婚準備ノート（引っ越し用）\nKNA1 ${JSON.stringify({names:{me:ME(), you:YOU()}, shared})}`;
+}
+// 戻り値：反映した数。読めなければ null
+function importAll(text){
+  const m = /KNA1\s+(\{[\s\S]*\})\s*$/.exec(String(text).trim());
+  let p = null; try{ p = m && JSON.parse(m[1]); }catch(e){}
+  if(!p || !p.shared || typeof p.shared!=='object') return null;
+  let n = 0;
+  for(const [t, T] of Object.entries(p.shared)){
+    if(!topicOf(t) || !T || !T.cards || typeof T.cards!=='object') continue;
+    for(const [c, X] of Object.entries(T.cards)){
+      if(!X || typeof X!=='object') continue;
+      const C = card(t, c), xts = X.ts || {};
+      for(const [f, val] of Object.entries(X.v || {})){
+        const ts = +xts[f] || 0, lt = C.ts?.[f] || 0, cur = C.v[f];
+        if(cur===undefined || ts > lt){
+          if(JSON.stringify(cur) !== JSON.stringify(val)){ C.v[f] = val; n++; }
+          (C.ts ||= {})[f] = Math.max(ts, lt);
+        }
+      }
+      for(const [f, k] of [['@st','st'], ['@next','next']]){
+        const ts = +xts[f] || 0, lt = C.ts?.[f] || 0;
+        if(typeof X[k]==='string' && X[k] && X[k]!==C[k] && (!C[k] || ts > lt)){ C[k] = X[k]; (C.ts ||= {})[f] = Math.max(ts, lt); n++; }
+      }
+      if(typeof X.at==='string' && X.at > (C.at || '')) C.at = X.at;
+    }
+  }
+  const nm = p.names || {};
+  for(const k of ['me','you']) if(typeof nm[k]==='string' && nm[k].trim() && nm[k]!==S.settings[k]){ S.settings[k] = nm[k].trim().slice(0,12); n++; }
+  saveSettings(); saveShared();
+  return n;
+}
+function mvResult(n){
+  const msg = n===null ? '読み取れませんでした。保存したファイルか、コピーした文章を全部貼ってください' : n ? `${n}か所を読み込みました` : '新しい内容はありませんでした';
+  if(n) renderSharedKeepScroll();
+  const el = document.getElementById('mvres'); if(el) el.textContent = msg; status(msg);
+}
+/*</main>*/
+function renderSoloFlow(){
+  const all = taskList(), mine = all.filter(x => x.who==='you'), rest = all.filter(x => x.who!=='you' && !x.done);
+  const row = (x, can) => `<label class="task ${x.done?'done':''}">${can ? `<input type="checkbox" data-ft="${x.id}" ${x.done?'checked':''}>` : '<span></span>'}
+    <span class="tt">${esc(x.t)}<small>${esc(whoLabel(x.who))}</small></span><span class="due">${dueChip(parseD(x.e), x.done)}</span></label>`;
+  return `<div class="cards">
+    <section class="q"><div class="q-head"><div class="q-title"><h3>${esc(YOU())}のやること</h3><p class="hint">終わったらチェック。「送る」で${esc(ME())}にも伝わります。</p></div></div>
+      <div class="q-body">${mine.length ? mine.map(x => row(x, x.seed)).join('') : '<div class="callout">いまはありません。</div>'}</div></section>
+    <section class="q"><div class="q-head"><div class="q-title"><h3>二人のやること（見るだけ）</h3><p class="hint">チェックは、会ったときに二人で付けます。</p></div></div>
+      <div class="q-body">${rest.map(x => row(x, false)).join('') || '<div class="callout">全部終わっています。</div>'}</div></section>
+  </div>`;
+}
+function renderIntro(){
+  if(SOLO) return `<div class="intro"><b>このノートについて</b>
+    <p style="margin:6px 0">次に会うときの話のタネに、自分の分だけ先に選んでおくノートです。${esc(ME())}の答えはここには出ません。ほとんどタップで選ぶだけです。</p>
+    <ol><li>どんな夫婦でいたいか</li><li>どんな家庭にしたいか</li><li>愛情の伝え方（公式の診断 約4分）</li><li>暮らしの楽しみ</li><li>プロポーズのこと（好みだけ）</li></ol>
+    <p style="margin:6px 0">全部埋めなくて大丈夫。迷ったら空けたままでOKです。書いた内容はこのスマホの中にだけ保存されます。書けたら最後の「送る」から、LINEで送ってください。</p>
+    <div class="row-btns"><button type="button" class="mini" data-act="intro-hide">わかったので閉じる</button></div></div>`;
+  return `<div class="intro"><b>このノートの使い方</b><ol>
+    <li>上の段から順に話します。1回20〜30分、1〜2ページずつで十分です。</li>
+    <li>迷ったら「仮」でOK。あとからいつでも直せます。</li>
+    <li>考えが違ったら「二人の意見が違う」を押して、それぞれの考えを残してから結論を選びます。</li>
+    <li>「決定」にしたカードはたたまれるので、残っている話題がすぐわかります。</li>
+    <li>話したことは「まとめ」から文章でコピーできます。</li></ol>
+    <div class="row-btns"><button type="button" class="mini" data-act="intro-hide">わかったので閉じる</button></div></div>`;
+}
+function renderPager(T){
+  const tops = TOPS(), i = tops.indexOf(T), prev = tops[i-1], next = tops[i+1];
+  return `<div class="pager">${prev?`<button type="button" data-go="${prev.id}">← ${prev.label}</button>`:''}${next?`<button type="button" class="next" data-go="${next.id}">次：${next.label} →</button>`:''}</div>`;
+}
+
+/* ================= 日付・やることの行 ================= */
+const DOW='日月火水木金土';
+function parseD(s){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m?new Date(+m[1],+m[2]-1,+m[3]):null; }
+function today0(){ const d=new Date(); return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
+function dueOf(x){ if(x.abs) return parseD(x.abs); const p=parseD(S.self.pdate); if(!p||x.rel===undefined) return null; const d=new Date(p); d.setDate(d.getDate()+x.rel); return d; }
+function dueChip(d, done){
+  if(!d) return '';
+  const lbl = `${d.getMonth()+1}/${d.getDate()}（${DOW[d.getDay()]}）`;
+  if(done) return `<span class="chip ok">完了</span><span>${lbl}</span>`;
+  const diff = Math.round((d - today0())/86400000);
+  if(diff<0) return `<span class="chip bad">${-diff}日過ぎ</span><span>${lbl}</span>`;
+  if(diff===0) return `<span class="chip bad">今日まで</span><span>${lbl}</span>`;
+  if(diff<=7) return `<span class="chip tmp">あと${diff}日</span><span>${lbl}</span>`;
+  return `<span class="chip">${lbl}まで</span>`;
+}
+function taskRow(x, withDue){
+  const done = !!S.self.checks[x.id];
+  return `<label class="task ${done?'done':''}"><input type="checkbox" data-self-check="${x.id}" ${done?'checked':''}>
+    <span class="tt">${esc(x.t)}${x.n?`<small>${esc(x.n)}</small>`:''}${x.w?`<small>${esc(x.w)}</small>`:''}</span>
+    <span class="due">${withDue?dueChip(dueOf(x),done):''}${/^[A-Z]\d/.test(x.id)?`<span class="id">${x.id}</span>`:''}</span></label>`;
+}
+
+function renderSelf(){} function drawPin(){} function enterSelf(){} function exitSelf(){} function paintSelfTotal(){}
+function render(){ S.mode==='self' ? renderSelf() : renderShared(); }
+
+/* ================= 入力 ================= */
+function setK(k, val){
+  const [t,c,f] = k.split('|'); const C = card(t,c);
+  if(f==='@st') C.st = val; else if(f==='@next') C.next = val;
+  else if(f.startsWith('rows.')){ const [,i,x]=f.split('.'); (C.v.rows ||= []); (C.v.rows[+i] ||= {}); C.v.rows[+i][x]=val; }
+  else C.v[f] = val;
+  (C.ts ||= {})[f] = Date.now();
+  C.at = new Date().toISOString();
+  saveShared();
+}
+function autosize(el){ el.style.height='auto'; el.style.height = el.scrollHeight+2+'px'; }
+function autosizeAll(){ document.querySelectorAll('textarea.area').forEach(autosize); }
+
+document.addEventListener('input', e=>{
+  const el = e.target;
+  if(el.dataset.k){
+    setK(el.dataset.k, el.type==='checkbox' ? el.checked : el.value);
+    if(el.type==='range') el.classList.remove('unset');
+    if(el.tagName==='TEXTAREA') autosize(el);
+    paintCalc();
+  }
+  else if(el.dataset.selfK){ S.self[el.dataset.selfK] = el.value; if(el.tagName==='TEXTAREA') autosize(el); saveSelf(); paintSelfTotal(); if(el.dataset.selfK==='pdate') renderSelfKeepScroll(); }
+  else if(el.dataset.fe){ const [id,f] = el.dataset.fe.split('|'); if(f==='t') setTask(id, f, el.value); }
+  else if(el.dataset.sp){
+    const [list,i,k] = el.dataset.sp.split('.');
+    (S.self[list] ||= []); (S.self[list][+i] ||= {}); S.self[list][+i][k] = el.value;
+    saveSelf();
+  }
+});
+document.addEventListener('change', e=>{
+  const el = e.target;
+  if(el.id==='mvfile'){ const f = el.files?.[0]; if(f) f.text().then(t => mvResult(importAll(t)), () => mvResult(null)); el.value = ''; return; }
+  if(el.dataset.selfCheck){ S.self.checks[el.dataset.selfCheck] = el.checked; saveSelf(); renderSelfKeepScroll(); }
+  else if(el.dataset.ft){ setTask(el.dataset.ft, 'done', el.checked); renderSharedKeepScroll(); }
+  // 名前の欄では描き直さない（隣の日付欄をタップした瞬間に編集欄が作り直されてしまうため）。名前は閉じたときに一覧へ反映
+  else if(el.dataset.fe){ const [id,f] = el.dataset.fe.split('|'); if(f!=='t'){ setTask(id, f, el.value); renderSharedKeepScroll(); } }
+  else if(el.dataset.k && (el.dataset.k.endsWith('|@next') || el.dataset.k.startsWith('mrule|base|pct'))) renderSharedKeepScroll();
+});
+document.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b || b.closest('#overlay')) return;
+  if(b.dataset.pick){
+    const k=b.dataset.pick, cur=kv(k), v=b.dataset.val;
+    setK(k, cur===v ? '' : v);
+    if(k.endsWith('|@st')) delete S.open[k.split('|').slice(0,2).join('|')];  // 決定したらたたむ
+    renderSharedKeepScroll();
+    if(v==='other' && cur!=='other') document.querySelector(`[data-k="${k}.other"]`)?.focus();
+    return;
+  }
+  if(b.dataset.act==='ftedit'){ const inn = b.dataset.in || 'gantt';
+    S.editTask = S.editTask===b.dataset.id && S.editIn===inn ? null : b.dataset.id; S.editIn = inn; renderSharedKeepScroll(); return; }
+  if(b.dataset.act==='ftcand'){
+    const C = card('flow','tasks'), s0 = today0(), e = new Date(s0); e.setDate(e.getDate()+14);
+    const eIso = isoOf(e) < P_TARGET ? isoOf(e) : P_TARGET;
+    (C.v.rows ||= []).push({t:b.dataset.t, cat:b.dataset.cat, who:b.dataset.who, s:isoOf(s0), e:eIso, ...(b.dataset.go ? {go:b.dataset.go} : {})});
+    C.at = new Date().toISOString(); saveShared(); status('一覧に入れました。タップで日付を直せます'); renderSharedKeepScroll(); return;
+  }
+  if(b.dataset.act==='ftclose'){ S.editTask = null; renderSharedKeepScroll(); return; }
+  if(b.dataset.act==='ftwho'){ setTask(b.dataset.id, 'who', b.dataset.val); renderSharedKeepScroll(); return; }
+  if(b.dataset.act==='ftadd'){
+    const C = card('flow','tasks'), s = today0(), e = new Date(s); e.setDate(e.getDate()+7);
+    (C.v.rows ||= []).push({t:'', s:isoOf(s), e:isoOf(e), who:'both', ...(b.dataset.cat ? {cat:b.dataset.cat} : {})});
+    S.editTask = 'u'+(C.v.rows.length-1); S.editIn = b.dataset.cat ? 'list' : 'gantt'; C.at = new Date().toISOString(); saveShared();
+    renderSharedKeepScroll(); document.querySelector(`[data-fe="${S.editTask}|t"]`)?.focus(); return;
+  }
+  if(b.dataset.act==='ftdel'){
+    const id = b.dataset.id, C = card('flow','tasks');
+    if(id[0]==='u') C.v.rows.splice(+id.slice(1), 1); else C.v[id+'.hide'] = true;
+    C.at = new Date().toISOString(); S.editTask = null; saveShared(); renderSharedKeepScroll(); return;
+  }
+  if(b.dataset.act==='tagadd'){ S.adding=b.dataset.row; renderSharedKeepScroll(); document.getElementById('addin')?.focus(); return; }
+  if(b.dataset.act==='tagaddok'){ addCustom(); return; }
+  if(b.dataset.act==='tagaddcancel'){ S.adding=null; renderSharedKeepScroll(); return; }
+  if(b.dataset.act==='tagdel'){
+    const ck=b.dataset.ck, label=b.dataset.label;
+    setK(ck, (kv(ck)||[]).filter(x => x!==label));
+    for(const sk of b.dataset.sels.split(',')) setK(sk, (kv(sk)||[]).filter(x => x!=='x:'+label));
+    renderSharedKeepScroll(); return;
+  }
+  if(b.dataset.tag){
+    const k=b.dataset.tag, arr=[...(kv(k)||[])], v=b.dataset.val, i=arr.indexOf(v);
+    if(i<0) arr.push(v); else arr.splice(i,1);
+    setK(k, arr); renderSharedKeepScroll(); return;
+  }
+  const act = b.dataset.act;
+  if(act==='split'){ S.split[b.dataset.key] = b.dataset.shown!=='1'; renderSharedKeepScroll(); return; }
+  if(act==='open'){ S.open[b.dataset.card]=true; renderSharedKeepScroll(); return; }
+  if(act==='fold'){ delete S.open[b.dataset.card]; renderSharedKeepScroll(); return; }
+  if(act==='memo'){ S.memo[b.dataset.card]=true; renderSharedKeepScroll();
+    document.querySelector(`[data-k="${b.dataset.card}|_memo"]`)?.focus(); return; }
+  if(act==='intro-hide'){ lsSet(LS+'intro-hide', true); renderSharedKeepScroll(); return; }
+  if(act==='mcopy'){ copyText(matchText(), document.getElementById('mBox'), 'mmsg'); return; }
+  if(act==='xsend'){ copyText(exportYou(), document.getElementById('xBox'), 'xmsg'); return; }
+  if(act==='mvcopy'){ copyText(exportAll(), document.getElementById('mvBox'), 'mvmsg'); return; }
+  if(act==='mvsave'){
+    const d = new Date(), ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([exportAll()], {type:'text/plain'}));
+    a.download = `結婚準備ノート_引っ越し_${ymd}.txt`; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    const msg = 'ファイルを保存しました。Google ドライブなど、移す先の端末で開ける場所に置いてください';
+    document.getElementById('mvmsg').textContent = msg; status(msg); return;
+  }
+  if(act==='mvrecv'){ const t = document.getElementById('mvin').value; mvResult(t.trim() ? importAll(t) : null); return; }
+  if(act==='xrecv'){
+    const t = document.getElementById('xin').value, n = t.trim() ? importYou(t) : null;
+    const msg = n===null ? '読み取れませんでした。届いた文章を、最初から最後まで全部貼ってください' : n ? `${n}か所を反映しました${SOLO ? '' : '。「答え合わせ」で二人の答えを並べて見られます'}` : '新しい内容はありませんでした';
+    if(n) renderSharedKeepScroll();
+    document.getElementById('xres').textContent = msg; status(msg); return;
+  }
+  if(act==='sumf'){ S.sumFilter=b.dataset.val; renderSharedKeepScroll(); return; }
+  if(act==='copy'){
+    const text = summaryText(), box = document.getElementById('copyBox');
+    const fallback = () => { box.value=text; box.hidden=false; autosize(box); box.focus(); box.select(); status('自動でコピーできませんでした。下の文章を選んでコピーしてください'); };
+    try{ navigator.clipboard.writeText(text).then(()=>status('コピーしました。LINEなどに貼れます'), fallback); }catch(e){ fallback(); }
+    return;
+  }
+  if(b.dataset.go){ S.topic=b.dataset.go; lsSet(LS+'tab', S.topic); renderShared(); window.scrollTo({top:0}); return; }
+  if(b.dataset.act==='addrow'){ const [t,c]=b.dataset.card.split('|'); const C=card(t,c); (C.v.rows ||= []).push({}); C.at=new Date().toISOString(); saveShared(); renderSharedKeepScroll(); return; }
+  if(b.dataset.act==='delrow'){ const [t,c]=b.dataset.card.split('|'); const C=card(t,c); C.v.rows.splice(+b.dataset.i,1); C.at=new Date().toISOString(); saveShared(); renderSharedKeepScroll(); return; }
+  if(b.dataset.act==='exit'){ exitSelf(); return; }
+  if(b.dataset.act==='selfadd'){ (S.self[b.dataset.list] ||= []).push({}); saveSelf(); renderSelfKeepScroll(); return; }
+  if(b.dataset.act==='selfdel'){ S.self[b.dataset.list].splice(+b.dataset.i, 1); saveSelf(); renderSelfKeepScroll(); return; }
+});
+// 公式診断の割合の編集欄：開いている間は描き直さず、閉じたときに順位とヒントへ反映
+document.addEventListener('toggle', e=>{
+  const d = e.target;
+  if(d instanceof HTMLDetailsElement && d.dataset.keep){ S.keep[d.dataset.keep] = d.open; return; }  // 描き直しても開いたままにする
+  if(!(d instanceof HTMLDetailsElement) || !d.classList.contains('lo-edit')) return;
+  S.loEdit[d.dataset.lo] = d.open;
+  if(!d.open) renderSharedKeepScroll();
+}, true);
+function addCustom(){
+  const inp = document.getElementById('addin'); if(!inp) return;
+  const label = inp.value.trim().replace(/,/g,'、');
+  if(label){
+    const ck = inp.dataset.ck, row = inp.dataset.row;
+    const list = kv(ck) || []; if(!list.includes(label)) setK(ck, [...list, label]);
+    const sel = kv(row) || []; if(!sel.includes('x:'+label)) setK(row, [...sel, 'x:'+label]);  // 足した列ではそのまま選択
+  }
+  S.adding = null; renderSharedKeepScroll();
+}
+document.addEventListener('keydown', e=>{
+  if(e.target.id!=='addin') return;
+  if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); addCustom(); }
+  else if(e.key==='Escape'){ S.adding=null; renderSharedKeepScroll(); }
+});
+function keepScroll(fn){ const y=window.scrollY; const a=document.activeElement?.id; fn(); window.scrollTo({top:y}); if(a) document.getElementById(a)?.focus({preventScroll:true}); }
+const renderSharedKeepScroll = () => S.mode==='shared' && keepScroll(renderShared);
+const renderSelfKeepScroll = () => S.mode==='self' && keepScroll(renderSelf);
+
+/* ================= 保存（この端末の中だけ） ================= */
+const savedEl = document.getElementById('saved');
+function status(msg){ savedEl.textContent = msg; }
+function lsSave(k, v){ status(lsSet(k, v) ? 'この端末に保存しました' : '保存できませんでした（ブラウザの設定を確認してください）'); }
+const saveShared = () => lsSave(LS+'shared', S.shared);
+const saveSelf = () => lsSave(LS+'self-local', S.self);
+const saveSettings = () => lsSave(LS+'settings', S.settings);
+
+/* ================= 鍵 ================= */
+let pinBuf='', pinMode='enter', pinFirst='';
+
+document.getElementById('overlay').addEventListener('click', e=>{
+  const b = e.target.closest('[data-pin]');
+  if(!b){ if(e.target.classList.contains('ov')) closeOverlay(); return; }
+  const k=b.dataset.pin;
+  if(k==='x'){ closeOverlay(); return; }
+  if(k==='b'){ pinBuf=pinBuf.slice(0,-1); drawPin(''); return; }
+  if(pinBuf.length<4) pinBuf+=k;
+  if(pinBuf.length<4){ drawPin(''); return; }
+  if(pinMode==='enter'){
+    if(pinBuf===S.self.pin){ closeOverlay(); enterSelf(); } else { pinBuf=''; drawPin('違います'); }
+  } else if(pinMode==='set'){ pinFirst=pinBuf; pinBuf=''; pinMode='confirm'; drawPin(''); }
+  else { if(pinBuf===pinFirst){ S.self.pin=pinBuf; saveSelf(); closeOverlay(); enterSelf(); } else { pinBuf=''; pinMode='set'; drawPin('一致しませんでした。もう一度決めてください'); } }
+});
+document.addEventListener('keydown', e=>{
+  if(!document.querySelector('.ov')) return;
+  if(e.key==='Escape'){ closeOverlay(); return; }
+  if(!document.querySelector('.ov .pad')) return;
+  if(/^\d$/.test(e.key)) document.querySelector(`[data-pin="${e.key}"]`)?.click();
+  else if(e.key==='Backspace') document.querySelector('[data-pin="b"]')?.click();
+});
+function closeOverlay(){ document.getElementById('overlay').innerHTML=''; }
+
+
+/* ================= 呼び方 ================= */
+document.getElementById('btnNames').addEventListener('click', ()=>{
+  document.getElementById('overlay').innerHTML = `<div class="ov" role="dialog" aria-modal="true" aria-label="呼び方"><form class="sheet" id="namesForm">
+    <h3>呼び方</h3><p>表の見出しや担当の選択肢に使います。</p>
+    <div class="field"><label for="nmMe">自分</label><input class="txt" id="nmMe" value="${esc(S.settings.me)}"></div>
+    <div class="field"><label for="nmYou">お相手</label><input class="txt" id="nmYou" value="${esc(S.settings.you)}"></div>
+    <div class="row-btns"><button type="button" class="btn" id="nmCancel">やめる</button><button type="submit" class="btn pri">変更する</button></div>
+  </form></div>`;
+  document.getElementById('nmCancel').onclick = closeOverlay;
+  document.getElementById('namesForm').onsubmit = ev => { ev.preventDefault();
+    S.settings.me = document.getElementById('nmMe').value.trim() || DEF_NAMES.me;
+    S.settings.you = document.getElementById('nmYou').value.trim() || DEF_NAMES.you;
+    saveSettings(); closeOverlay(); render(); };
+});
+
+/* ================= 起動 ================= */
+(function boot(){
+  const cached = lsGet(LS+'shared'); if(cached && typeof cached==='object') S.shared = cached;
+  const st = lsGet(LS+'settings'); if(st) Object.assign(S.settings, st);
+  const self = lsGet(LS+'self-local'); if(self) Object.assign(S.self, self);
+  const tab = lsGet(LS+'tab'); if(tab && topicOf(tab)) S.topic = tab;
+  // 以前のチェックを、二人用のやることへ引き継ぐ
+  const tv = card('flow','tasks').v;
+  
+  render();
+  status('この端末にだけ保存されます');
+})();
+})();
+</script>
+
+</body>
+</html>
